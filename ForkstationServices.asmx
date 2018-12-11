@@ -1088,10 +1088,19 @@
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $result = curl_exec($ch);
             $data = $result;
-
+            //echo $data;
             $data = json_decode($data, true);
             //var_dump($data);
             $dom = new DOMDocument();
+            $Cont_AddressR = $dom->createElement('ClientAddressC');
+            $success = $dom->createElement('Success', $data["Success"]);
+            $ClientAddress = $dom->createElement('ClientAddress');
+            $ClientAddress = getInsertChildren($dom, $data["ClientAddress"], $ClientAddress);
+            $Cont_AddressR->appendChild($success);
+            $Cont_AddressR->appendChild($ClientAddress);
+            $dom->appendChild($Cont_AddressR);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
         break;
         case 'ChangePassword':break;
         case 'CheckOrderStatus':break;

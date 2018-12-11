@@ -372,20 +372,53 @@ $address = $_POST['address'];
                             ),
                         ),
                         'ScheduleOut'=>array(
-                                'ScheduleID'=>'',                            
-                                'Monday'=>'',                            
-                                'Tuesday'=>'',                            
-                                'Wednesday'=>'',                            
-                                'Thursday'=>'',                            
-                                'Friday'=>'',                            
-                                'Saturday'=>'',                            
-                                'Sunday'=>'',                            
+                            'ScheduleID'=>'',                            
+                            'Monday'=>'',                            
+                            'Tuesday'=>'',                            
+                            'Wednesday'=>'',                            
+                            'Thursday'=>'',                            
+                            'Friday'=>'',                            
+                            'Saturday'=>'',                            
+                            'Sunday'=>'',                            
                         ),
                     )
                 )
 );
 break;
 case 'GetOrderRecalcPay':
+
+break;
+case 'AddClientAddress':
+$SessionKey = $_REQUEST['SessionKey'];
+$Address = $_REQUEST['Address'];
+$Suit = $_REQUEST['Suit'];
+$City = $_REQUEST['City'];
+$State = $_REQUEST['State'];
+$ZIPCode = $_REQUEST['ZIPCode'];
+$CrossStreet = $_REQUEST['CrossStreet'];
+$Phone = $_REQUEST['Phone'];
+$AddressName = $_REQUEST['AddressName'];
+header ('Content-Type: application/json');
+
+$data=array(
+    'Success' => 'address added successfully',
+    'ClientAddress' => array(
+        'ClientAddressID' => 12,
+        'ClientID' => 12,
+        'Address' => 12,
+        'Suit' => 12,
+        'City' => 12,
+        'State' => 12,
+        'ZIPCode' => 12,
+        'CrossStreet' => 12,
+        'Phone' => 12,
+        'AddressName' => 12,
+        'CreationDate' => 12,
+        'Default' => 12,
+        'Enable' => 12,
+    ),
+);
+echo json_encode($data);
 
 break;
 }
