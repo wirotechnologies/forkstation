@@ -401,7 +401,7 @@ $AddressName = $_REQUEST['AddressName'];
 header ('Content-Type: application/json');
 
 $data=array(
-    'Success' => 'address added successfully',
+    'Success' => 'true',
     'ClientAddress' => array(
         'ClientAddressID' => 12,
         'ClientID' => 12,
