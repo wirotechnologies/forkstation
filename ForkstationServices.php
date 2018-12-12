@@ -534,11 +534,121 @@ case 'GetOrderRecalcPay':
         )),
         'ReceiptLink'=>'3',
         'DeliveryFee'=>'3',
-    ),
+        ),
 
-);
-header ('Content-Type: application/json');
-echo json_encode($data);
+    );
+    header ('Content-Type: application/json');
+    echo json_encode($data);
 
 break;
+
+case 'SetTipsAndDiscount':
+    $data = array(
+        'Order' => array(
+            "OrderID" => "4",
+            "OrderNum" => "4",
+            "RestaurantID" => "4",
+            "ClietID" => "4",
+            "TotalPriceOrder" => "4",
+            "Paid" => "4",
+            "CreationDate" => "4",
+            "PaymentDate" => "4",
+            "PaymentType" => "4",
+            "BasePriceOrder" => "4",
+            "TaxOrder" => "4",
+            "Tip" => "4",
+            "DeliveryAddressStr" => "4",
+            "Cupon" => "4",
+            "DiscountValue" => "4",
+            "BasePriceOrderAferDiscount" => "4",
+            "TotalPriceOrderComplete" => "4",
+            "Schedule" => "4",
+            "OrderType" => "4",
+            "ProductOrder" => array(array(
+                "Quantity" =>"44",
+                "ProductTotalValue" =>"44",
+                "Product" => array(
+                    "ProductID" => "444",
+                    "Name" => "444",
+                    "Description" => "444",
+                    "ProductImg" => "444",
+                    "Enable" => "444",
+                    "CategoryID" => "444",
+                    "Category" => "444",
+                    "CreationDate" => "444",
+                    "ProductOrder" => "444",
+                    "CategoryOrder" => "444",
+                    "Value" => "444",
+                    "TotalValue" => "444",
+                    "ProductPropertyCart" => array(array(
+                        "ProductPropertyID" => "4444" ,
+                        "ProductID" => "4444" ,
+                        "FatherProductPropertyID" => "4444" ,
+                        "Name" => "4444" ,
+                        "PropertyType" => "4444" ,
+                        "GroupingTypeID" => "4444" ,
+                        "GroupingType" => "4444" ,
+                        "PropertyValueCart" => array(array(
+                            "PropertyValueID" => "44444",
+
+
+
+                            "ProductPropertyID" => "44444",
+
+
+
+                            "ProductID" => "44444",
+
+
+
+                            "Label" => "44444",
+
+
+
+                            "Price" => "44444",
+
+
+
+                            "Cant" => "44444",
+
+
+
+                            "TotalPrice" => "44444",
+
+
+
+                        )) ,
+                    )),
+                ),
+                "Instructions" =>"44",
+            )),
+            "ReceipLink" => "4",
+            "DeliveryFee" => "4",
+        ),
+    );
+    header ('Content-Type: application/json');
+    echo json_encode($data);
+    break;
+
+case 'GetClientPayments':
+    $data = array(
+        "TcOut" => array(array(
+            "CardType" => "5",
+            "CardExpiration" => "5",
+            "CardNumber" => "5",
+            "PaymenProfileID" => "5",
+            "BillingInfo" => array(
+                "First" => "55",
+                "Last" => "55",
+                "Street" => "55",
+                "City" => "55",
+                "State" => "55",
+                "Zip" => "55",
+            ),
+        )),
+    );
+    header ('Content-Type: application/json');
+    echo json_encode($data);
+    
+    break;
 }

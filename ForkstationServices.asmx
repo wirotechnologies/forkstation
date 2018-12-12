@@ -1177,6 +1177,56 @@ $address = $jsonData->address;
             Header('Content-type: text/xml');
             echo $dom->saveXML();
         break;
+        case 'SetTipsAndDiscount':
+            $jsonData = json_decode($obj->Body->SetTipsAndDiscount->JsonSetTipsAndDiscount, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('TipsAndDiscount');
+            $orderElement = $dom->createElement('Order');
+            $orderElement = getInsertChildren($dom, $data["Order"], $orderElement);
+            $mainElement->appendChild($orderElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+        break; 
+        case 'GetClientPayments':
+            $jsonData = json_decode($obj->Body->GetClientPayments->JsonGetClientPayments, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('ClientPayments');
+            $txoutElement = $dom->createElement('TcOut');
+            $txoutElement = getInsertChildren($dom, $data["TcOut"], $txoutElement);
+            $mainElement->appendChild($txoutElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+        break; 
         case 'ChangePassword':break;
         case 'CheckOrderStatus':break;
         case 'ClientLogOut':break;
@@ -1191,13 +1241,11 @@ $address = $jsonData->address;
         case 'RemoveClientAddress':break;
         case 'SetDefaultClientAddress':break;
         case 'SetNewCard':break;
-        case 'SetTipsAndDiscount':break; //Siguientes
         case 'SetNewCard':break;
         case 'UpdateClientAddress':break;
         case 'UpdateClientProfile':break;
         case 'GetAllContactsType':break;
         case 'GetBanners':break;
-        case 'GetClientPayments':break; //Siguientes
         case 'GetDefaultUserAddress':break;
         case 'GetFavoritesOrders':break;
         case 'GetFavoritesRestaurants':break;
