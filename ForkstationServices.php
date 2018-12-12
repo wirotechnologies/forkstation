@@ -385,39 +385,159 @@ $address = $_POST['address'];
                 )
 );
 break;
-case 'GetOrderRecalcPay':
+case 'AddClientAddress':
+    $SessionKey = $_REQUEST['SessionKey'];
+    $Address = $_REQUEST['Address'];
+    $Suit = $_REQUEST['Suit'];
+    $City = $_REQUEST['City'];
+    $State = $_REQUEST['State'];
+    $ZIPCode = $_REQUEST['ZIPCode'];
+    $CrossStreet = $_REQUEST['CrossStreet'];
+    $Phone = $_REQUEST['Phone'];
+    $AddressName = $_REQUEST['AddressName'];
+    header ('Content-Type: application/json');
+
+    $data=array(
+        'Success' => 'true',
+        'ClientAddress' => array(
+            'ClientAddressID' => 12,
+            'ClientID' => 12,
+            'Address' => 12,
+            'Suit' => 12,
+            'City' => 12,
+            'State' => 12,
+            'ZIPCode' => 12,
+            'CrossStreet' => 12,
+            'Phone' => 12,
+            'AddressName' => 12,
+            'CreationDate' => 12,
+            'Default' => 12,
+            'Enable' => 12,
+        ),
+    );
+    echo json_encode($data);
 
 break;
-case 'AddClientAddress':
-$SessionKey = $_REQUEST['SessionKey'];
-$Address = $_REQUEST['Address'];
-$Suit = $_REQUEST['Suit'];
-$City = $_REQUEST['City'];
-$State = $_REQUEST['State'];
-$ZIPCode = $_REQUEST['ZIPCode'];
-$CrossStreet = $_REQUEST['CrossStreet'];
-$Phone = $_REQUEST['Phone'];
-$AddressName = $_REQUEST['AddressName'];
-header ('Content-Type: application/json');
 
-$data=array(
-    'Success' => 'true',
-    'ClientAddress' => array(
-        'ClientAddressID' => 12,
-        'ClientID' => 12,
-        'Address' => 12,
-        'Suit' => 12,
-        'City' => 12,
-        'State' => 12,
-        'ZIPCode' => 12,
-        'CrossStreet' => 12,
-        'Phone' => 12,
-        'AddressName' => 12,
-        'CreationDate' => 12,
-        'Default' => 12,
-        'Enable' => 12,
+case 'CreateShoppingCart':
+    header ('Content-Type: application/json');
+
+    $data=array(
+        "TotalValuePreorder" => "2",
+        "BaseValuePreorder" => "2",
+        "TaxValuePreorder" => "2",
+        "RestaurantDeliveryFee" => "2",
+        "PreOrderID" => "2",
+        "ProductOrder"=> array(
+            array(
+                "Quantity" => "22",
+                "ProductTotalValue" => "22",
+                "Product" => array(
+                    "ProductID" => "222",
+                    "Name" => "222",
+                    "Description" => "222",
+                    "Value" => "222",
+                    "ProductImg" => "222",
+                    "Enable" => "222",
+                    "CategoryID" => "222",
+                    "Category" => "222",
+                    "CreationDate" => "222",
+                    "ProductOrder" => "222",
+                    "CategoryOrder" => "222",
+                    "ProductPropertyCart" => array(array(
+                        "ProductPropertyID" => "2222",
+                        "ProductID" => "2222",
+                        "FatherProductPropertyID" => "2222",
+                        "Name" => "2222",
+                        "PropertyType" => "2222",
+                        "GroupingTypeID" => "2222",
+                        "GroupingType" => "2222",
+                        "PropertyValueCart" => array(array(
+                            "PropertyValueID" => "22222",
+                            "ProductPropertyID" => "22222",
+                            "ProductID" => "22222",
+                            "Label" => "22222",
+                            "Price" => "22222",
+                            "Cant" => "22222",
+                            "TotalPrice" => "22222",
+                        )),
+                    )),
+                    "Instructions" => "222",
+                ),
+            ),
+        ),
+    );
+    echo json_encode($data);
+
+break;
+
+case 'GetOrderRecalcPay':
+    $data = array(
+    'ErrMessage' => "Error Model Conect",
+    'Success' => "true",
+    "Order"=>array(
+        'OrderID'=>'3',
+        'OrderNum'=>'3',
+        'RestaurantID'=>'3',
+        'ClientID'=>'3',
+        'TotalPriceOrder'=>'3',
+        'Paid'=>'3',
+        'CreationDate'=>'3',
+        'PaymentDate'=>'3',
+        'PaymentType'=>'3',
+        'BasePriceOrder'=>'3',
+        'TaxOrder'=>'3',
+        'Tip'=>'3',
+        'DeliveryAddressStr'=>'3',
+        'Cupon'=>'3',
+        'DiscountValue'=>'3',
+        'BasePriceOrderAferDiscount'=>'3',
+        'TotalPriceOrderComplete'=>'3',
+        'Schedule'=>'3',
+        'OrderType'=>'3',
+        'ProductOrder'=>array(array(
+            "Quantity" => "33",
+            "ProductTotalValue" => "33",
+            "Product" => array(
+                "ProductID" => "333",
+                "Name" => "333",
+                "Description" => "333",
+                "ProductImg" => "333",
+                "Enable" => "333",
+                "CategoryID" => "333",
+                "Category" => "333",
+                "CreationDate" => "333",
+                "ProductOrder" => "333",
+                "CategoryOrder" => "333",
+                "Value" => "333",
+                "TotalValue" => "333",
+                "ProductPropertyCart" => array(array(
+                    "ProductPropertyID"=>"3333",
+                    "ProductID"=>"3333",
+                    "FatherProductPropertyID"=>"3333",
+                    "Name"=>"3333",
+                    "PropertyType"=>"3333",
+                    "GroupingTypeID"=>"3333",
+                    "GroupingType"=>"3333",
+                    "PropertyValueCart"=>array(array(
+                        "PropertyValueID" => "33333",
+                        "ProductPropertyID" => "33333",
+                        "ProductID" => "33333",
+                        "Label" => "33333",
+                        "Price" => "33333",
+                        "Cant" => "33333",
+                        "TotalPrice" => "33333",
+                    )),
+                )),
+            ),
+            "Instructions" => "33",
+        )),
+        'ReceiptLink'=>'3',
+        'DeliveryFee'=>'3',
     ),
+
 );
+header ('Content-Type: application/json');
 echo json_encode($data);
 
 break;
