@@ -1227,8 +1227,37 @@ $address = $jsonData->address;
             Header('Content-type: text/xml');
             echo $dom->saveXML();
         break; 
+        case 'CheckOrderStatus':
+            $jsonData = json_decode($obj->Body->CheckOrderStatus->JsonCheckOrderStatus, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('CheckOrderStatus');
+            $orderElement = $dom->createElement('Order');
+            $RestaurantElement = $dom->createElement('Restaurant');
+            $orderStatusElement = $dom->createElement('OrderStatus', !empty($data["OrderStatus"])?$data["OrderStatus"]:"error" );
+            $orderElement = getInsertChildren($dom, $data["Order"], $orderElement);
+            $RestaurantElement = getInsertChildren($dom, $data["Restaurant"], $RestaurantElement);
+            $mainElement->appendChild($orderElement);
+            $mainElement->appendChild($RestaurantElement);
+            $mainElement->appendChild($orderStatusElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+        break; //siguiente
         case 'ChangePassword':break;
-        case 'CheckOrderStatus':break;
         case 'ClientLogOut':break;
         case 'CreateClient':break;
         case 'DeleteCard':break;
@@ -1249,7 +1278,7 @@ $address = $jsonData->address;
         case 'GetDefaultUserAddress':break;
         case 'GetFavoritesOrders':break;
         case 'GetFavoritesRestaurants':break;
-        case 'GetOrderForPay':break;
+        case 'GetOrderForPay':break; //siguiente
         case 'GetProductComments':break;
         case 'GetProfileBySessionKey':break;
         case 'GetUserAddress':break;

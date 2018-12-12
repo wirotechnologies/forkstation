@@ -590,33 +590,12 @@ case 'SetTipsAndDiscount':
                         "GroupingType" => "4444" ,
                         "PropertyValueCart" => array(array(
                             "PropertyValueID" => "44444",
-
-
-
                             "ProductPropertyID" => "44444",
-
-
-
                             "ProductID" => "44444",
-
-
-
                             "Label" => "44444",
-
-
-
                             "Price" => "44444",
-
-
-
                             "Cant" => "44444",
-
-
-
                             "TotalPrice" => "44444",
-
-
-
                         )) ,
                     )),
                 ),
@@ -651,4 +630,123 @@ case 'GetClientPayments':
     echo json_encode($data);
     
     break;
+
+case 'CheckOrderStatus':
+        $data = array(
+            'Order'=>array(
+                "OrderID" => "7",
+                "OrderNum" => "7",
+                "RestaurantID" => "7",
+                "ClientID" => "7",
+                "TotalPriceOrder" => "7",
+                "Paid" => "7",
+                "CreationDate" => "7",
+                "PaymentDate" => "7",
+                "PaymentType" => "7",
+                "BasePriceOrder" => "7",
+                "TaxOrder" => "7",
+                "Tip" => "7",
+                "DeliveryAddressStr" => "7",
+                "Cupon" => "7",
+                "DiscountValue" => "7",
+                "BasePriceOrderAferDiscount" => "7",
+                "TotalPriceOrderComplete" => "7",
+                "Schedule" => "7",
+                "OrderType" => "7",
+                "ProductOrder" => array(array(
+                    "Quantity" => "77",
+                    "ProductTotalValue" => "77",
+                    "Product" => array(
+                        "ProductID" => "777",
+                        "Name" => "777",
+                        "Description" => "777",
+                        "ProductImg" => "777",
+                        "Enable" => "777",
+                        "CategoryID" => "777",
+                        "Category" => "777",
+                        "CreationDate" => "777",
+                        "ProductOrder" => "777",
+                        "CategoryOrder" => "777",
+                        "Value" => "777",
+                        "TotalValue" => "777",
+                        "ProductPropertyCart" => array(array(
+                            "ProductPropertyID" => "7777",
+                            "ProductID" => "7777",
+                            "FatherProductPropertyID" => "7777",
+                            "Name" => "7777",
+                            "PropertyType" => "7777",
+                            "GroupingTypeID" => "7777",
+                            "GroupingType" => "7777",
+                            "PropertyValueCart" => array(array(
+                                "PropertyValueID" => "77777",
+                                "ProductPropertyID" => "77777",
+                                "ProductID" => "77777",
+                                "Label" => "77777",
+                                "Price" => "77777",
+                                "Cant" => "77777",
+                                "TotalPrice" => "77777",
+                            )),
+                        )),
+                    ),
+                    "Instructions" => "77"
+                )),
+                "ReceiptLink" => "7",
+                "DeliveryFee" => "7",
+            ),
+            "Restaurant" => array(
+                "RestaurantID" => "7",
+                "RestaurantChainID" => "7",
+                "Name" => "7",
+                "Description" => "7",
+                "Image" => "7",
+                "Tips" => "7",
+                "DeliveryArea" => "7",
+                "DeliveryTime" => "7",
+                "OurKitchen" => "7",
+                "Address" => "7",
+                "Phones" => "7",
+                "Rate" => "7",
+                "MinimumOrder" => "7",
+                "Tax" => "7",
+                "DeliveryCost" => "7",
+                "Longitude" => "7",
+                "Latitude" => "7",
+                "Zip" => "7",
+                "Distance" => "7",
+                "Web" => "7",
+                "CreationDate" => "7",
+                "Delivery" => "7",
+                "Pickup" => "7",
+                "Enable" => "7",
+                "YelpId" => "7",
+                "Dividends_percent" => "7",
+                "Filters" => array(
+                    "Delivery"=> "77",
+                    "Pickup"=> "77",
+                    "FreeDelivery"=> "77",
+                    "OpenNow"=> "77",
+                    "HaveCoupons"=> "77",
+                ),
+                "PaymentTypeOut" => array(array(
+                    "PaymentTypeID" => "77",
+                    "PaymentType" => "77",
+                    "Icon" => "77",
+                    "Enable" => "77",
+                )),
+                "ScheduleOut" => array(
+                    "ScheduleID" => "77",
+                    "Monday" => "77",
+                    "Tuesday" => "77",
+                    "Wednesday" => "77",
+                    "Thursday" => "77",
+                    "Friday" => "77",
+                    "Saturday" => "77",
+                    "Sunday" => "77",
+                ),
+            ),
+            "OrderStatus" => "true",
+        );
+        header ('Content-Type: application/json');
+        echo json_encode($data);
+        break;
 }
