@@ -1008,99 +1008,99 @@ $address = $jsonData->address;
 
         break;
         case 'ValidateUser':
-        $jsonData = json_decode($obj->Body->ValidateUser->JsonValidaUser);
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $urlServices);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('mail' => $mail, 'password' => $password, 'op' => $op)));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $jsonData = json_decode($obj->Body->ValidateUser->JsonValidaUser);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('mail' => $mail, 'password' => $password, 'op' => $op)));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        $result = curl_exec($ch);
-        $data = $result;
+            $result = curl_exec($ch);
+            $data = $result;
 
-        $data = json_decode($data, true);
+            $data = json_decode($data, true);
 
-        $dom = new DOMDocument();
-        $ValidateU = $dom->createElement('ValidatorUser');
-        $user = $dom->createElement('User');
-        $clientId = $dom->createElement('ClientID', $data["User"]["ClientID"]);
-        $clientIdS = $dom->createElement('ClientID', $data["User"]["ClientID"]);
-        $session = $dom->createElement('Session', $data["Session"]["SessionKey"]);
-        $user->appendChild($clientId);
-        $session->appendChild($clientIdS);
-        $ValidateU->appendChild($session);
-        $ValidateU->appendChild($user);
-        $dom->appendChild($ValidateU);
-        Header('Content-type: text/xml');
-        echo $dom->saveXML();
+            $dom = new DOMDocument();
+            $ValidateU = $dom->createElement('ValidatorUser');
+            $user = $dom->createElement('User');
+            $clientId = $dom->createElement('ClientID', $data["User"]["ClientID"]);
+            $clientIdS = $dom->createElement('ClientID', $data["User"]["ClientID"]);
+            $session = $dom->createElement('Session', $data["Session"]["SessionKey"]);
+            $user->appendChild($clientId);
+            $session->appendChild($clientIdS);
+            $ValidateU->appendChild($session);
+            $ValidateU->appendChild($user);
+            $dom->appendChild($ValidateU);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
 
-        break;
+            break;
 
         case 'GetOrder':            
-        $jsonData = json_decode($obj->Body->GetOrder->JsonGetOrder);
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $urlServices);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('mail' => $jsonData->SessionKey, 'password' => $jsonData->lg, 'orderid' => $jsonData->orderid, 'op' => $op)));
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $jsonData = json_decode($obj->Body->GetOrder->JsonGetOrder);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('mail' => $jsonData->SessionKey, 'password' => $jsonData->lg, 'orderid' => $jsonData->orderid, 'op' => $op)));
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
-        $result = curl_exec($ch);
-        $data = $result;
+            $result = curl_exec($ch);
+            $data = $result;
 
-        $data = json_decode($data, true);
-            //var_dump($data);
-        $dom = new DOMDocument();
-        $Cont_order = $dom->createElement('GetOrder');
-        $order = $dom->createElement('order');
-        $Restaurant = $dom->createElement('Restaurant');
-        $order = getInsertChildren($dom, $data["order"], $order);
-        $Restaurant = getInsertChildren($dom, $data["Restaurant"], $Restaurant);
-        $Cont_order->appendChild($order);
-        $Cont_order->appendChild($Restaurant);
-        $dom->appendChild($Cont_order);
-        Header('Content-type: text/xml');
-        echo $dom->saveXML();
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $Cont_order = $dom->createElement('GetOrder');
+            $order = $dom->createElement('order');
+            $Restaurant = $dom->createElement('Restaurant');
+            $order = getInsertChildren($dom, $data["order"], $order);
+            $Restaurant = getInsertChildren($dom, $data["Restaurant"], $Restaurant);
+            $Cont_order->appendChild($order);
+            $Cont_order->appendChild($Restaurant);
+            $dom->appendChild($Cont_order);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
 
-        break;
+            break;
         case 'AddClientAddress':
-        $jsonData = json_decode($obj->Body->AddClientAddress->JsonAddAddressClient);
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $urlServices);
-        curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
-            array(
-                'SessionKey' => $jsonData->SessionKey, 
-                'Address' => $jsonData->Address, 
-                'Suit' => $jsonData->Suit, 
-                'City' => $jsonData->City,
-                'State' => $jsonData->State, 
-                'ZIPCode' => $jsonData->ZIPCode, 
-                'CrossStreet' => $jsonData->CrossStreet, 
-                'Phone' => $jsonData->Phone,
-                'AddressName' => $jsonData->AddressName,
-                'op' => $op
-            )
-        )); 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        $result = curl_exec($ch);
-        $data = $result;
-            //echo $data;
-        $data = json_decode($data, true);
-            //var_dump($data);
-        $dom = new DOMDocument();
-        $Cont_AddressR = $dom->createElement('ClientAddressC');
-        $success = $dom->createElement('Success', $data["Success"]);
-        $ClientAddress = $dom->createElement('ClientAddress');
-        $ClientAddress = getInsertChildren($dom, $data["ClientAddress"], $ClientAddress);
-        $Cont_AddressR->appendChild($success);
-        $Cont_AddressR->appendChild($ClientAddress);
-        $dom->appendChild($Cont_AddressR);
-        Header('Content-type: text/xml');
-        echo $dom->saveXML();
-        break;
+            $jsonData = json_decode($obj->Body->AddClientAddress->JsonAddAddressClient);
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                array(
+                    'SessionKey' => $jsonData->SessionKey, 
+                    'Address' => $jsonData->Address, 
+                    'Suit' => $jsonData->Suit, 
+                    'City' => $jsonData->City,
+                    'State' => $jsonData->State, 
+                    'ZIPCode' => $jsonData->ZIPCode, 
+                    'CrossStreet' => $jsonData->CrossStreet, 
+                    'Phone' => $jsonData->Phone,
+                    'AddressName' => $jsonData->AddressName,
+                    'op' => $op
+                )
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $Cont_AddressR = $dom->createElement('ClientAddressC');
+            $success = $dom->createElement('Success', $data["Success"]);
+            $ClientAddress = $dom->createElement('ClientAddress');
+            $ClientAddress = getInsertChildren($dom, $data["ClientAddress"], $ClientAddress);
+            $Cont_AddressR->appendChild($success);
+            $Cont_AddressR->appendChild($ClientAddress);
+            $dom->appendChild($Cont_AddressR);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
         case 'CreateShoppingCart':
             $jsonData = json_decode($obj->Body->CreateShoppingCart->JsonCreateShoppingCart, true);
             $ch = curl_init();
@@ -1278,7 +1278,34 @@ $address = $jsonData->address;
         case 'GetDefaultUserAddress':break;
         case 'GetFavoritesOrders':break;
         case 'GetFavoritesRestaurants':break;  //siguiente
-        case 'GetOrderForPay':break; //siguiente
+        case 'GetOrderForPay':
+            $jsonData = json_decode($obj->Body->GetOrderForPay->JsonGetOrderForPay, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('GetOrderForPay');
+            $FrmParamsElement = $dom->createElement('FrmParams');
+            $FrmParamsElement = getInsertChildren($dom, $data["FrmParams"], $FrmParamsElement);
+            $FrmInputsElement = $dom->createElement('FrmInputs');
+            $FrmInputsElement = getInsertChildren($dom, $data["FrmInputs"], $FrmInputsElement);
+            $mainElement->appendChild($FrmParamsElement);
+            $mainElement->appendChild($FrmInputsElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+        break; 
         case 'GetProductComments':break;
         case 'GetProfileBySessionKey':
             $jsonData = json_decode($obj->Body->GetProfileBySessionKey->JsonGetProfileBySessionKey, true);
@@ -1349,7 +1376,7 @@ $address = $jsonData->address;
                 $padre->appendChild(getInsertChildren($dom, $value,$son));
                 //var_dump($value);
             }else{
-                $padre->appendChild($dom->createElement($key, $value));
+                $padre->appendChild($dom->createElement(is_numeric ($key) ? $padre->tagName.$key : $key, $value));
             }
         }
     } catch (Exception $e) {

@@ -793,4 +793,51 @@ case 'CheckOrderStatus':
         header ('Content-Type: application/json');
         echo json_encode($data);
         break;
+    case 'GetOrderForPay':
+        $data = array(
+            "FrmParams" => array(
+                "buttonLabel" => "10",
+                "URL" => "10",
+            ),
+            "FrmInputs" => array(
+                "x_login" => "10",
+                "x_amount" => "10",
+                "x_tip" => "10",
+                "x_freight" => "10",
+                "x_tax" => "10",
+                "x_tax_exempt" => "10",
+                "x_po_num" => "10",
+                "x_description" => "10",
+                "x_test_request" => "10",
+                "x_invoice_num" => "10",
+                "x_myorder_id" => "10",
+                "x_fp_sequence" => "10",
+                "x_fp_timestamp" => "10",
+                "x_fp_hash" => "10",
+                "x_show_form" => "10",
+                "x_recurring_billing" => "10",
+                "x_cust_id" => "10",
+                "x_myclient_id" => "10",
+                "x_zip" => "10",
+                "x_address" => "10",
+                "x_city" => "10",
+                "x_state" => "10",
+                "x_email" => "10",
+                "x_email_customer" => "10",
+                "x_first_name" => "10",
+                "x_ship_to_zip" => "10",
+                "x_ship_to_address" => "10",
+                "x_ship_to_city" => "10",
+                "x_ship_to_state" => "10",
+                "x_ship_to_first_name" => "10",
+                "x_relay_always" => "10",
+                "x_relay_url" => "10",
+                "x_relay_response" => "10",
+                "string" => array("String1s","String2s"),
+            ),
+        );
+        
+        header ('Content-Type: application/json');
+        echo json_encode($data);
+        break;
 }
