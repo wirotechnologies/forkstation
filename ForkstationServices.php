@@ -749,4 +749,48 @@ case 'CheckOrderStatus':
         header ('Content-Type: application/json');
         echo json_encode($data);
         break;
+    case 'GetUserAddress':
+        $data = array(
+            'ClientAddressOut' => array(array(
+                "ClientAddressID" => "8",
+                "ClientID" => "8",
+                "Address" => "Cra 25 # 12 - 15",
+                "Suit" => "8",
+                "City" => "Miami",
+                "State" => "8",
+                "ZIPCode" => "8",
+                "CrossStreet" => "8",
+                "Phone" => "8",
+                "AddressName" => "8",
+                "CreationDate" => "8",
+                "Default" => "8",
+                "Enable" => "8",
+            )),
+        );
+        header ('Content-Type: application/json');
+        echo json_encode($data);
+        break;
+    case 'GetProfileBySessionKey':
+        $data = array(
+            'User' => array(
+                    "ClientID" => "9",
+                    "UserName" => "9",
+                    "Password" => "9",
+                    "FullName" => "9",
+                    "eMail" => "9",
+                    "FacebookID" => "9",
+                    "TwitterID" => "9",
+                    "Address" => "9",
+                    "Cellphone" => "9",
+                    "CreationDate" => "9",
+                ),
+            'Session' => array(
+                "SessionKey" => "key_s",
+                "TimeExpiration" => "9",
+                "ClientID" => "9",
+            ),
+        );
+        header ('Content-Type: application/json');
+        echo json_encode($data);
+        break;
 }
