@@ -1,6 +1,6 @@
 
 	  function YelpRequestSOAP(YelpID,Callback) {
-                var wsUrl = "https://backservices.forkstation.com/Services/Gateway.php?action=getYelpReviews&data-id="+YelpID;
+                var wsUrl = "http://backservices.forkstation.com/Services/Gateway.php?action=getYelpReviews&data-id="+YelpID;
 				
 launchSOAP(wsUrl,Callback);    
 		}
