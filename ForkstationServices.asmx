@@ -1276,8 +1276,52 @@ $address = $jsonData->address;
         case 'GetAllContactsType':break;
         case 'GetBanners':break;
         case 'GetDefaultUserAddress':break;
-        case 'GetFavoritesOrders':break;
-        case 'GetFavoritesRestaurants':break;  //siguiente
+        case 'GetFavoritesOrders':
+            $jsonData = json_decode($obj->Body->GetFavoritesOrders->JsonGetFavoritesOrders, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('GetFavoritesOrders');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;    //siguiente
+        case 'GetFavoritesRestaurants':
+            $jsonData = json_decode($obj->Body->GetFavoritesRestaurants->JsonGetFavoritesRestaurants, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('GetFavoritesRestaurants');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+        break;  //siguiente
         case 'GetOrderForPay':
             $jsonData = json_decode($obj->Body->GetOrderForPay->JsonGetOrderForPay, true);
             $jsonData["op"] = $op;
