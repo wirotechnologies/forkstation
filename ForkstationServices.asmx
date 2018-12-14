@@ -1478,7 +1478,7 @@ $address = $jsonData->address;
             $dom->appendChild($mainElement);
             Header('Content-type: text/xml');
             echo $dom->saveXML();
-        break;
+            break;
         case 'GetOrderForPay':
             $jsonData = json_decode($obj->Body->GetOrderForPay->JsonGetOrderForPay, true);
             $jsonData["op"] = $op;
