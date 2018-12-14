@@ -1269,10 +1269,77 @@ $address = $jsonData->address;
         case 'RateRestaurantOrder':break;
         case 'RemoveClientAddress':break;
         case 'SetDefaultClientAddress':break;
-        case 'SetNewCard':break;
-        case 'SetNewCard':break;
-        case 'UpdateClientAddress':break;
-        case 'UpdateClientProfile':break;
+        case 'SetNewCard':
+            $jsonData = json_decode($obj->Body->SetNewCard->JsonSetNewCard, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('SetNewCard');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+
+        break; //Siguiente
+        case 'UpdateClientAddress':
+            $jsonData = json_decode($obj->Body->UpdateClientAddress->JsonUpdateClientAddress, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('UpdateClientAddress');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break; //Siguiente
+        case 'UpdateClientProfile':
+            $jsonData = json_decode($obj->Body->UpdateClientProfile->JsonUpdateClientProfile, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('UpdateClientProfile');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+
+        break; //Siguiente
         case 'GetAllContactsType':break;
         case 'GetBanners':break;
         case 'GetDefaultUserAddress':break;
@@ -1298,7 +1365,7 @@ $address = $jsonData->address;
             $dom->appendChild($mainElement);
             Header('Content-type: text/xml');
             echo $dom->saveXML();
-            break;    //siguiente
+            break;
         case 'GetFavoritesRestaurants':
             $jsonData = json_decode($obj->Body->GetFavoritesRestaurants->JsonGetFavoritesRestaurants, true);
             $jsonData["op"] = $op;
@@ -1321,7 +1388,7 @@ $address = $jsonData->address;
             $dom->appendChild($mainElement);
             Header('Content-type: text/xml');
             echo $dom->saveXML();
-        break;  //siguiente
+        break;
         case 'GetOrderForPay':
             $jsonData = json_decode($obj->Body->GetOrderForPay->JsonGetOrderForPay, true);
             $jsonData["op"] = $op;

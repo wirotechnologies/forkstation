@@ -849,7 +849,7 @@ $address = $_POST['address'];
                         "ClientID" => "A",
                         "TotalPriceOrder" => "A",
                         "Paid" => "A",
-                        "CreationDate" => "A",
+                        "CreationDate" => "2018-12-15T12:00",
                         "PaymentDate" => "A",
                         "PaymentType" => "A",
                         "BasePriceOrder" => "A",
@@ -1013,4 +1013,54 @@ $address = $_POST['address'];
                 header ('Content-Type: application/json');
                 echo json_encode($data);
                 break;
+            case 'SetNewCard':
+                $data = [
+                    "Success" => "Success Process",
+                    "ErrMessage" => "Message Error",
+                ];
+                header ('Content-Type: application/json');
+                echo json_encode($data);
+            break; 
+            case 'UpdateClientAddress':
+                $data = array(
+                    "ClientAddressID" => "12",
+                    "ClientID" => "12",
+                    "Address" => "12",
+                    "Suit" => "12",
+                    "City" => "12",
+                    "State" => "12",
+                    "ZIPCode" => "12",
+                    "CrossStreet" => "12",
+                    "Phone" => "12",
+                    "AddressName" => "12",
+                    "CreationDate" => "12",
+                    "Default" => "12",
+                    "Enable" => "12",
+                );
+                header ('Content-Type: application/json');
+                echo json_encode($data);
+            break; 
+            case 'UpdateClientProfile':
+                $data = array(
+                    'User' => array(
+                        "ClientID" => "11",
+                        "UserName" => "11",
+                        "Password" => "11",
+                        "FullName" => "11",
+                        "eMail" => "11",
+                        "FacebookID" => "11",
+                        "TwitterID" => "11",
+                        "Address" => "11",
+                        "Cellphone" => "11",
+                        "CreationDate" => "Cra 25 # 12 - 15",
+                    ),
+                    'Session'=>[
+                        "SessionKey" => "key_s",
+                        "TimeExpiration" => "11",
+                        "ClientID" => "11",
+                    ],
+                );
+                header ('Content-Type: application/json');
+                echo json_encode($data);
+            break; 
 }
