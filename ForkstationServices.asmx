@@ -1259,12 +1259,80 @@ $address = $jsonData->address;
         break; 
         case 'ChangePassword':break;
         case 'ClientLogOut':break;
-        case 'CreateClient':break;
+        case 'CreateClient':
+            $jsonData = json_decode($obj->Body->CreateClient->JsonCreateClient, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('CreateClient');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+
+            break;
         case 'DeleteCard':break;
         case 'DuplicateOrder2':break;
-        case 'NewContact':break;
+        case 'NewContact':
+            $jsonData = json_decode($obj->Body->NewContact->JsonNewContact, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('NewContact');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+
+            break;
         case 'NewProductComment':break;
-        case 'NewPwdChange':break;
+        case 'NewPwdChange':
+            $jsonData = json_decode($obj->Body->NewPwdChange->JsonNewPwdChange, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('NewPwdChange');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
         case 'PayOrder':break;
         case 'RateRestaurantOrder':break;
         case 'RemoveClientAddress':break;
@@ -1340,7 +1408,29 @@ $address = $jsonData->address;
             echo $dom->saveXML();
 
             break; 
-        case 'GetAllContactsType':break;
+        case 'GetAllContactsType':
+            $jsonData = json_decode($obj->Body->GetAllContactTypes->JsonGetAllContactTypes, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('GetAllContactTypes');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
         case 'GetBanners':break;
         case 'GetDefaultUserAddress':break;
         case 'GetFavoritesOrders':

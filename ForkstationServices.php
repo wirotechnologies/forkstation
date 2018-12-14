@@ -1039,7 +1039,7 @@ $address = $_POST['address'];
                 );
                 header ('Content-Type: application/json');
                 echo json_encode($data);
-            break; 
+                break; 
             case 'UpdateClientProfile':
                 $data = array(
                     'User' => array(
@@ -1062,5 +1062,55 @@ $address = $_POST['address'];
                 );
                 header ('Content-Type: application/json');
                 echo json_encode($data);
-            break; 
-}
+                break; 
+            case 'GetAllContactsType':
+                $data = [
+                    "ContactTypeOut" => [
+                        "ContactTypeID" => "Contact Type ID",
+                        "ContactType" => "Contact Type",
+                    ],
+                ];
+                header ('Content-Type: application/json');
+                echo json_encode($data);
+                break;
+            case 'NewContact':
+                $data = [
+                    "Success" => "true",
+                    "ErrMessage" => "Message Error",
+                ];
+                header ('Content-Type: application/json');
+                echo json_encode($data);
+                break;
+            case 'NewPwdChange':
+                $data = [
+                    "Success" => "true",
+                    "ErrMessage" => "Message Error",
+                ];
+                header ('Content-Type: application/json');
+                echo json_encode($data);
+
+                break;
+            case 'CreateClient':
+                $data = array(
+                        'User' => array(
+                                "ClientID" => "12",
+                                "UserName" => "12",
+                                "Password" => "12",
+                                "FullName" => "12",
+                                "eMail" => "12",
+                                "FacebookID" => "12",
+                                "TwitterID" => "12",
+                                "Address" => "12",
+                                "Cellphone" => "12",
+                                "CreationDate" => "12",
+                            ),
+                        'Session' => array(
+                            "SessionKey" => "key_s",
+                            "TimeExpiration" => "12",
+                            "ClientID" => "12",
+                        ),
+                    );
+                    header ('Content-Type: application/json');
+                    echo json_encode($data);
+                break;
+}           
