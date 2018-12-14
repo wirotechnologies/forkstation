@@ -1292,7 +1292,7 @@ $address = $jsonData->address;
             Header('Content-type: text/xml');
             echo $dom->saveXML();
 
-        break; //Siguiente
+            break; 
         case 'UpdateClientAddress':
             $jsonData = json_decode($obj->Body->UpdateClientAddress->JsonUpdateClientAddress, true);
             $jsonData["op"] = $op;
@@ -1315,7 +1315,7 @@ $address = $jsonData->address;
             $dom->appendChild($mainElement);
             Header('Content-type: text/xml');
             echo $dom->saveXML();
-            break; //Siguiente
+            break; 
         case 'UpdateClientProfile':
             $jsonData = json_decode($obj->Body->UpdateClientProfile->JsonUpdateClientProfile, true);
             $jsonData["op"] = $op;
@@ -1339,7 +1339,7 @@ $address = $jsonData->address;
             Header('Content-type: text/xml');
             echo $dom->saveXML();
 
-        break; //Siguiente
+            break; 
         case 'GetAllContactsType':break;
         case 'GetBanners':break;
         case 'GetDefaultUserAddress':break;

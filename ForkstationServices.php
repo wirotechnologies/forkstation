@@ -1020,7 +1020,7 @@ $address = $_POST['address'];
                 ];
                 header ('Content-Type: application/json');
                 echo json_encode($data);
-            break; 
+                break; 
             case 'UpdateClientAddress':
                 $data = array(
                     "ClientAddressID" => "12",
