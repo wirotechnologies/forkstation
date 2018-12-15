@@ -1257,8 +1257,32 @@ $address = $jsonData->address;
             Header('Content-type: text/xml');
             echo $dom->saveXML();
         break; 
-        case 'ChangePassword':break;
-        case 'ClientLogOut':break;
+        case 'ChangePassword':
+            break;
+        case 'ClientLogOut':
+            $jsonData = json_decode($obj->Body->ClientLogOut->JsonClientLogOut, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('ClientLogOut');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+
+            break;
         case 'CreateClient':
             $jsonData = json_decode($obj->Body->CreateClient->JsonCreateClient, true);
             $jsonData["op"] = $op;
@@ -1283,8 +1307,54 @@ $address = $jsonData->address;
             echo $dom->saveXML();
 
             break;
-        case 'DeleteCard':break;
-        case 'DuplicateOrder2':break;
+        case 'DeleteCard':
+            $jsonData = json_decode($obj->Body->DeleteCard->JsonDeleteCard, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('DeleteCard');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+
+            break;
+        case 'DuplicateOrder2':
+            $jsonData = json_decode($obj->Body->DuplicateOrder2->JsonDuplicateOrder2, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('DuplicateOrder2');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+
+            break;
         case 'NewContact':
             $jsonData = json_decode($obj->Body->NewContact->JsonNewContact, true);
             $jsonData["op"] = $op;
@@ -1309,7 +1379,29 @@ $address = $jsonData->address;
             echo $dom->saveXML();
 
             break;
-        case 'NewProductComment':break;
+        case 'NewProductComment':
+            $jsonData = json_decode($obj->Body->NewProductComment->JsonNewProductComment, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('NewProductComment');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
         case 'NewPwdChange':
             $jsonData = json_decode($obj->Body->NewPwdChange->JsonNewPwdChange, true);
             $jsonData["op"] = $op;
@@ -1426,8 +1518,8 @@ $address = $jsonData->address;
                 //var_dump($data);
             $dom = new DOMDocument();
             $mainElement =  $dom->createElement('GetAllContactTypes');
-            $mainElement = getInsertChildren($dom, $data, $mainElement);
-            $dom->appendChild($mainElement);
+            getInsertChildren2($dom, $data, $mainElement);
+            $mainElement =$dom->appendChild($mainElement);
             Header('Content-type: text/xml');
             echo $dom->saveXML();
             break;
@@ -1506,7 +1598,7 @@ $address = $jsonData->address;
             $dom->appendChild($mainElement);
             Header('Content-type: text/xml');
             echo $dom->saveXML();
-        break; 
+            break; 
         case 'GetProductComments':break;
         case 'GetProfileBySessionKey':
             $jsonData = json_decode($obj->Body->GetProfileBySessionKey->JsonGetProfileBySessionKey, true);
@@ -1585,3 +1677,22 @@ $address = $jsonData->address;
     }
     return $padre;
 }
+    function getInsertChildren2($dom, $contenedor, $padre){
+        $elements = [];
+        try {
+            foreach ($contenedor as $key => $value) {
+                if(is_array($value)){
+                    foreach ($value as $key2 => $value2) {
+                        $child = $dom->createElement($key);
+                        foreach ($value2 as $key3 => $value3) {
+                            $child->appendChild($dom->createElement($key3, $value3));
+                        }
+                        $padre->appendChild($child);
+                    }
+                }
+            }
+        } catch (Exception $e) {
+            echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+        }
+        return $padre;
+    }
