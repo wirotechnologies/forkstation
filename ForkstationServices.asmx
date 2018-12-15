@@ -1425,10 +1425,98 @@ $address = $jsonData->address;
             Header('Content-type: text/xml');
             echo $dom->saveXML();
             break;
-        case 'PayOrder':break;
-        case 'RateRestaurantOrder':break;
-        case 'RemoveClientAddress':break;
-        case 'SetDefaultClientAddress':break;
+        case 'PayOrder':
+            $jsonData = json_decode($obj->Body->PayOrder->JsonPayOrder, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('PayOrder');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
+        case 'RateRestaurantOrder':
+            $jsonData = json_decode($obj->Body->RateRestaurantOrder->JsonRateRestaurantOrder, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('RateRestaurantOrder');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
+        case 'RemoveClientAddress':
+            $jsonData = json_decode($obj->Body->RemoveClientAddress->JsonRemoveClientAddress, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('RemoveClientAddress');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
+        case 'SetDefaultClientAddress':
+            $jsonData = json_decode($obj->Body->SetDefaultClientAddress->JsonSetDefaultClientAddress, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('SetDefaultClientAddress');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
         case 'SetNewCard':
             $jsonData = json_decode($obj->Body->SetNewCard->JsonSetNewCard, true);
             $jsonData["op"] = $op;
@@ -1523,8 +1611,52 @@ $address = $jsonData->address;
             Header('Content-type: text/xml');
             echo $dom->saveXML();
             break;
-        case 'GetBanners':break;
-        case 'GetDefaultUserAddress':break;
+        case 'GetBanners':
+            $jsonData = json_decode($obj->Body->GetBanners->JsonGetBanners, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('GetBanners');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
+        case 'GetDefaultUserAddress':
+            $jsonData = json_decode($obj->Body->GetDefaultUserAddress->JsonGetDefaultUserAddress, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('GetDefaultUserAddress');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
         case 'GetFavoritesOrders':
             $jsonData = json_decode($obj->Body->GetFavoritesOrders->JsonGetFavoritesOrders, true);
             $jsonData["op"] = $op;
@@ -1599,7 +1731,29 @@ $address = $jsonData->address;
             Header('Content-type: text/xml');
             echo $dom->saveXML();
             break; 
-        case 'GetProductComments':break;
+        case 'GetProductComments':
+            $jsonData = json_decode($obj->Body->GetProductComments->JsonGetProductComments, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('GetProductComments');
+            $mainElement = getInsertChildren($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
+            break;
         case 'GetProfileBySessionKey':
             $jsonData = json_decode($obj->Body->GetProfileBySessionKey->JsonGetProfileBySessionKey, true);
             $jsonData["op"] = $op;

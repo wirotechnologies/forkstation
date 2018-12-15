@@ -1334,5 +1334,98 @@ case 'NewProductComment':
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;
+case 'PayOrder':
+    $data = [
+        "Amount" => "14",
+        "Approved" => "14",
+        "AuthorizationCode" => "14",
+        "InvoiceNumber" => "14",
+        "CardNumber" => "14",
+        "ResponseCode" => "14",
+        "AuthorizeMessage" => "14",
+        "TransactionID" => "14",
+        "ResponseReasonCode" => "14",
+    ];
+    header ('Content-Type: application/json');
+    echo json_encode($data);
+    break;
 
+case 'RateRestaurantOrder':
+    $data = [
+        "Success" => "Success Process",
+        "ErrMessage" => "Message Error",
+    ];
+    header ('Content-Type: application/json');
+    echo json_encode($data);
+    break;
+case 'RemoveClientAddress':
+    $data = [
+        "Success" => "Success Process",
+        "ErrMessage" => "Message Error",
+    ];
+    header ('Content-Type: application/json');
+    echo json_encode($data);
+    break;
+case 'SetDefaultClientAddress':
+    $data = [
+        "Success" => "Success Process",
+        "ErrMessage" => "Message Error",
+    ];
+    header ('Content-Type: application/json');
+    echo json_encode($data);
+    break;
+case 'GetBanners':
+    $data = [
+        "BannerOut" => [[
+            "BannerID" => "15",
+            "BannerTypeID" => "15",
+            "Type" => "15",
+            "Title" => "15",
+            "Description" => "15",
+            "Image" => "15",
+            "Enable" => "15",
+            "CreationDate" => "15",
+        ]],
+    ];
+    header ('Content-Type: application/json');
+    echo json_encode($data);
+    break;
+case 'GetDefaultUserAddress':
+    $data = [
+        "ClientAddress" => [
+            "ClientAddressID" => "16",
+            "ClientID" => "16",
+            "Address" => "16",
+            "Suit" => "16",
+            "City" => "16",
+            "State" => "16",
+            "ZIPCode" => "16",
+            "CrossStreet" => "16",
+            "Phone" => "16",
+            "AddressName" => "16",
+            "CreationDate" => "16",
+            "Default" => "16",
+            "Enable" => "16",
+        ]
+    ];
+    header ('Content-Type: application/json');
+    echo json_encode($data);
+    break;
+case 'GetProductComments':
+    $data = [
+        "BannerOut" => [
+            "ProductCommentOut" => [[
+                "ProductCommentID" => "16",
+                "ProductID" => "16",
+                "ClientID" => "16",
+                "Rate" => "16",
+                "Comment" => "16",
+                "CreationDate" => "16",
+                "FullName" => "16",
+            ]],
+        ],
+    ];
+    header ('Content-Type: application/json');
+    echo json_encode($data);
+    break;
 }     
