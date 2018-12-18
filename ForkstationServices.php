@@ -234,12 +234,79 @@ $address = $_POST['address'];
             break;
 
             case 'ValidateUser':  
-                header ('Content-Type: application/json');
+
+                $conn = getConnection ();
+                $tokenface = $_REQUEST["FacebookToken"];
+                if (!empty($_REQUEST["FacebookToken"])) {
+                    $sql = "select users.UserID AS ClientID, oauth_identities.user_id As usuarioID, users.username AS UserName, users.password AS Password, users.email AS eMail, users.phone AS Cellphone, users.created_at As CreationDate,  users.id_profile from oauth_identities, users where access_token='$tokenface' and users.id=oauth_identities.user_id";    
+                    $stmt = $conn->query ($sql);
+                    $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                    $sql2 = "select concat_ws(', ', payments_profiles.last_name,  payments_profiles.first_name) As FullName, address AS Address from payments_profiles where payments_profiles.id_profile =".$data[0]["id_profile"]."";    
+                    $stmt2 = $conn->query ($sql2);
+                    $data2 = $stmt2->fetchAll (PDO::FETCH_ASSOC);
+                    //echo json_encode(!isset($data2));
+                    $paymentData = array(
+                        "FullName" => "",
+                        "FacebookID" => "",
+                        "TwitterID" => "",
+                        "Address" => "",
+                    );
+                    if(isset($data2)){
+                        foreach ($data2[0] as $key => $value) {
+                            $paymentData[$key] = $value;
+                        }
+                    }
+                    $sessionR = array(
+                        "SessionKey"=>"",
+                        "TimeExpiration"=>"",
+                        "ClientID"=>"",
+                    );
+                    array_push($data, $paymentData);
+                    $response = array("User" => $data[0], "Session" => $sessionR);
+                    header ('Content-Type: application/json');
+                    echo json_encode($response);
+                    //echo json_encode($paymentData);
+
+                }else{
+                    /*
+                    $sql = "select users.username AS UserName, users.password AS Password, concat_ws(', ', payments_profiles.last_name,  payments_profiles.first_name) As FullName, users.email AS eMail, oauth_identities.id AS FacebookID, payments_profiles.address, users.phone AS Cellphone, users.created_at from users, oauth_identities, payments_profiles where users.id=oauth_identities.user_id and oauth_identities.provider='facebook' and payments_profiles.id_profile = users.id_profile";
+                    */
+                    $email = $_REQUEST["mail"];
+                    $password = $_REQUEST["password"];
+                    $sql = "select users.UserID AS ClientID, users.username AS UserName, users.password AS Password, users.email AS eMail, users.phone AS Cellphone, users.created_at As CreationDate,  users.id_profile from users where users.email='$email' and users.password='$password'";
+                    $stmt = $conn->query ($sql);
+                    $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                    $sql2 = "select concat_ws(', ', payments_profiles.last_name,  payments_profiles.first_name) As FullName, address AS Address from payments_profiles where payments_profiles.id_profile =".$data[0]["id_profile"]."";    
+                    $stmt2 = $conn->query ($sql2);
+                    $data2 = $stmt2->fetchAll (PDO::FETCH_ASSOC);
+                    //echo json_encode(!isset($data2));
+                    $paymentData = array(
+                        "FullName" => "",
+                        "FacebookID" => "",
+                        "TwitterID" => "",
+                        "Address" => "",
+                    );
+                    if(isset($data2)){
+                        foreach ($data2[0] as $key => $value) {
+                            $paymentData[$key] = $value;
+                        }
+                    }
+                    $sessionR = array(
+                        "SessionKey"=>"key_s",
+                        "TimeExpiration"=>"",
+                        "ClientID"=>"",
+                    );
+                    array_push($data[0], $paymentData);
+                    $response = array("User" => $data[0], "Session" => $sessionR);
+                    header ('Content-Type: application/json');
+                    echo json_encode($response);
+                }
+                /*
                 echo json_encode(
                     array("User"=>array("ClientID"=>"1",
                         "UserName"=>"User Name",
                         "Password"=>"",
-                        "FullName"=>"Full name",
+                        "FullName"=>"Full name",    // --
                         "eMail"=>"email@gmail.com",
                         "FacebookID"=>"",
                         "TwitterID"=>"",
@@ -255,6 +322,8 @@ $address = $_POST['address'];
                     
 
                 ));
+                echo json_encode($data);
+                */
                 break;
             
             case 'GetOrder':
@@ -1097,6 +1166,24 @@ $address = $_POST['address'];
 
                 break;
             case 'CreateClient':
+                $email = $_REQUEST["mail"];
+                $pass = $_REQUEST["password"];
+                $fullname = $_REQUEST["fullname"];
+                $conn = getConnection ();
+                if(!empty($email)) {
+                    $sql = "insert into users (email, password, username, UserID) values ('$email', '$pass', '$fullname', 1)";
+                    try {
+                        $conn->beginTransaction();
+                        $conn->exec($sql);
+                        $conn->commit();
+                        //echo $sql;
+                    } catch (Exception $e) {
+                      $conn->rollBack();
+                      //echo "Failed: " . $e->getMessage();
+                    }
+                    //$stmt = $conn->query ($sql);
+                    //$data1 = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                }
                 $data = array(
                         'User' => array(
                                 "ClientID" => "12",
@@ -1110,7 +1197,7 @@ $address = $_POST['address'];
                                 "Cellphone" => "12",
                                 "CreationDate" => "12",
                             ),
-                        'Session' => array(
+                        'Section' => array(
                             "SessionKey" => "key_s",
                             "TimeExpiration" => "12",
                             "ClientID" => "12",

@@ -1008,12 +1008,15 @@ $address = $jsonData->address;
 
         break;
         case 'ValidateUser':
-            $jsonData = json_decode($obj->Body->ValidateUser->JsonValidaUser);
+            $jsonData = json_decode($obj->Body->ValidateUser->JsonValidaUser, true);
             $ch = curl_init();
+            $jsonData["op"] = $op;
+            //$jsonData["mail"]=$_REQUEST["mail"];
+            //$jsonData["password"]=$_REQUEST["password"];
             curl_setopt($ch, CURLOPT_URL, $urlServices);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('mail' => $mail, 'password' => $password, 'op' => $op)));
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($jsonData));
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
             $result = curl_exec($ch);
@@ -1025,12 +1028,37 @@ $address = $jsonData->address;
             $ValidateU = $dom->createElement('ValidatorUser');
             $user = $dom->createElement('User');
             $clientId = $dom->createElement('ClientID', $data["User"]["ClientID"]);
-            $clientIdS = $dom->createElement('ClientID', $data["User"]["ClientID"]);
-            $session = $dom->createElement('Session', $data["Session"]["SessionKey"]);
+            $UserName = $dom->createElement('UserName', $data["User"]["UserName"]);
+            $Password = $dom->createElement('Password', $data["User"]["Password"]);
+            $FullName = $dom->createElement('FullName', $data["User"]["FullName"]);
+            $eMail = $dom->createElement('eMail', $data["User"]["eMail"]);
+            $FacebookID = $dom->createElement('FacebookID', $data["User"]["FacebookID"]);
+            $TwitterID = $dom->createElement('TwitterID', $data["User"]["TwitterID"]);
+            $Address = $dom->createElement('Address', $data["User"]["Address"]);
+            $Cellphone = $dom->createElement('Cellphone', $data["User"]["Cellphone"]);
+            $CreationDate = $dom->createElement('CreationDate', $data["User"]["CreationDate"]);
             $user->appendChild($clientId);
-            $session->appendChild($clientIdS);
-            $ValidateU->appendChild($session);
+            $user->appendChild($UserName);
+            $user->appendChild($Password);
+            $user->appendChild($FullName);
+            $user->appendChild($eMail);
+            $user->appendChild($FacebookID);
+            $user->appendChild($TwitterID);
+            $user->appendChild($Address);
+            $user->appendChild($Cellphone);
+            $user->appendChild($CreationDate);
             $ValidateU->appendChild($user);
+            
+            $session = $dom->createElement('Session');
+            $sessionkey = $dom->createElement('SessionKey', $data["Session"]["SessionKey"]);
+            $TimeExpiration = $dom->createElement('TimeExpiration', $data["Session"]["TimeExpiration"]);
+            $clientIdS = $dom->createElement('ClientID', $data["User"]["ClientID"]);
+            $session->appendChild($clientIdS);
+            $session->appendChild($sessionkey);
+            $session->appendChild($TimeExpiration);
+            $ValidateU->appendChild($session);
+
+
             $dom->appendChild($ValidateU);
             Header('Content-type: text/xml');
             echo $dom->saveXML();
