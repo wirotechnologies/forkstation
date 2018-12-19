@@ -1050,7 +1050,8 @@ $address = $jsonData->address;
             $ValidateU->appendChild($user);
             
             $session = $dom->createElement('Session');
-            $sessionkey = $dom->createElement('SessionKey', $data["Session"]["SessionKey"]);
+            //$sessionkey = $dom->createElement('SessionKey', $data["Session"]["SessionKey"]);
+            $sessionkey = $dom->createElement('SessionKey', $data["User"]["ClientID"]);
             $TimeExpiration = $dom->createElement('TimeExpiration', $data["Session"]["TimeExpiration"]);
             $clientIdS = $dom->createElement('ClientID', $data["User"]["ClientID"]);
             $session->appendChild($clientIdS);
@@ -1813,6 +1814,7 @@ $address = $jsonData->address;
         case 'GetUserAddress':
             $jsonData = json_decode($obj->Body->GetUserAddress->JsonGetUserAddress, true);
             $jsonData["op"] = $op;
+            //$jsonData["SessionKey"] = 935;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $urlServices);
             curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -1828,9 +1830,17 @@ $address = $jsonData->address;
                 //var_dump($data);
             $dom = new DOMDocument();
             $mainElement =  $dom->createElement('GetUserAddress');
-            $ClientAddressOutElement = $dom->createElement('ClientAddressOut');
-            $ClientAddressOutElement = getInsertChildren($dom, $data["ClientAddressOut"], $ClientAddressOutElement);
-            $mainElement->appendChild($ClientAddressOutElement);
+            if(!empty($data["ClientAddressOut"]) && $data["errorResponse"] != "query error DB"){
+                try {
+                    //$ClientAddressOutElement = $dom->createElement('ClientAddressOut');
+                    $ClientAddressOutElement = getInsertChildren3($dom, $data["ClientAddressOut"], 'ClientAddressOut');
+                    $mainElement->appendChild($ClientAddressOutElement);
+                    
+                } catch (Exception $e) {
+                        echo 'Excepción capturada: 11',  $e->getMessage(), "\n";
+                        
+                }
+            }
             $dom->appendChild($mainElement);
             Header('Content-type: text/xml');
             echo $dom->saveXML();
@@ -1842,22 +1852,52 @@ $address = $jsonData->address;
         try {
             foreach ($contenedor as $key => $value) {
                 if(is_array($value)){
-                /*$son = $dom->createElement($key);
-                $son=getInsertChildren($dom, $value[0], $son);
-                $padre->appendChild($son);
-*/              
-                //echo $key."\n";
-                $son = $dom->createElement(is_numeric ($key) ? $padre->tagName.$key : $key);
-                $padre->appendChild(getInsertChildren($dom, $value,$son));
-                //var_dump($value);
-            }else{
-                $padre->appendChild($dom->createElement(is_numeric ($key) ? $padre->tagName.$key : $key, $value));
+                    /*$son = $dom->createElement($key);
+                    $son=getInsertChildren($dom, $value[0], $son);
+                    $padre->appendChild($son);
+    */              
+                    //echo $key."\n";
+                    $son = $dom->createElement(is_numeric ($key) ? $padre->tagName.$key : $key);
+                    $padre->appendChild(getInsertChildren($dom, $value,$son));
+                    //var_dump($value);
+                }else{
+                    $padre->appendChild($dom->createElement(is_numeric ($key) ? $padre->tagName.$key : $key, $value));
+                }
             }
+        } catch (Exception $e) {
+            echo 'Excepción capturada: ',  $e->getMessage(), "\n";
         }
-    } catch (Exception $e) {
-        echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+        return $padre;
     }
-    return $padre;
+function getInsertChildren3($dom, $contenedor, $padr){
+        $elements = [];
+        //echo "err".$padr."\t";
+        $temp = $padr;
+        $padre = $dom->createElement("cont".$temp);
+        try {
+            foreach ($contenedor as $key => $value) {
+                if(is_array($value)){
+                    /*$son = $dom->createElement($key);
+                    $son=getInsertChildren($dom, $value[0], $son);
+                    $padre->appendChild($son);
+    */ 
+
+                    //echo $key."\n";
+                    $son = is_numeric ($key) ? $padr.$key : $key;
+                    //var_dump($value);
+                    $cont = $dom->createElement($temp);
+                    $cont->appendChild(getInsertChildren3($dom, $value,$son));
+                    $padre->appendChild($cont);
+                    //echo "err";
+                    //var_dump($value);
+                }else{
+                    $padre->appendChild($dom->createElement(is_numeric ($key) ? $padre->tagName : $key, $value));
+                }
+            }
+        } catch (Exception $e) {
+            echo 'Excepción capturada: ',  $e->getMessage(), "\n";
+        }
+        return $padre;
 }
     function getInsertChildren2($dom, $contenedor, $padre){
         $elements = [];

@@ -455,6 +455,7 @@ $address = $_POST['address'];
                 );
                 break;
             case 'AddClientAddress':
+
                 $SessionKey = $_REQUEST['SessionKey'];
                 $Address = $_REQUEST['Address'];
                 $Suit = $_REQUEST['Suit'];
@@ -464,27 +465,25 @@ $address = $_POST['address'];
                 $CrossStreet = $_REQUEST['CrossStreet'];
                 $Phone = $_REQUEST['Phone'];
                 $AddressName = $_REQUEST['AddressName'];
-                header ('Content-Type: application/json');
 
-                $data=array(
-                    'Success' => 'true',
-                    'ClientAddress' => array(
-                        'ClientAddressID' => 12,
-                        'ClientID' => 12,
-                        'Address' => 12,
-                        'Suit' => 12,
-                        'City' => 12,
-                        'State' => 12,
-                        'ZIPCode' => 12,
-                        'CrossStreet' => 12,
-                        'Phone' => 12,
-                        'AddressName' => 12,
-                        'CreationDate' => 12,
-                        'Default' => 12,
-                        'Enable' => 12,
-                    ),
-                );
-                echo json_encode($data);
+                $conn = getConnection ();
+                    $sql = "insert into direcciones_clientes (idUser, type_address, address, apt, zipcode, city, state, cross_street, phone, direcciones_clientes.default) values ($SessionKey, '$AddressName', '$Address', '$Suit', '$ZIPCode', '$City', '$State', '$CrossStreet', '$Phone', 1)";
+                    //echo $sql;
+                    try {
+                        $conn->beginTransaction();
+                        $conn->exec($sql);
+                        $conn->commit();
+                        //echo $sql;
+                    } catch (Exception $e) {
+                      $conn->rollBack();
+                      //echo "Failed: " . $e->getMessage();
+                    }
+                    //$stmt = $conn->query ($sql);
+                    //$data1 = $stmt->fetchAll (PDO::FETCH_ASSOC);
+
+               $data = getAddress($SessionKey, $conn);
+               echo json_encode($data);
+
 
                 break;
 
@@ -819,25 +818,12 @@ $address = $_POST['address'];
                     echo json_encode($data);
                     break;
             case 'GetUserAddress':
-                $data = array(
-                    'ClientAddressOut' => array(array(
-                        "ClientAddressID" => "8",
-                        "ClientID" => "8",
-                        "Address" => "Cra 25 # 12 - 15",
-                        "Suit" => "8",
-                        "City" => "Miami",
-                        "State" => "8",
-                        "ZIPCode" => "8",
-                        "CrossStreet" => "8",
-                        "Phone" => "8",
-                        "AddressName" => "8",
-                        "CreationDate" => "8",
-                        "Default" => "8",
-                        "Enable" => "8",
-                    )),
-                );
-                header ('Content-Type: application/json');
-                echo json_encode($data);
+                $sessionk = $_REQUEST["SessionKey"];
+                    $conn = getConnection();
+                    $data = getAddress($sessionk, $conn, 'ClientAddressOut');
+               echo json_encode($data);
+
+                
                 break;
             case 'GetProfileBySessionKey':
                     $data = array(
@@ -1516,3 +1502,39 @@ case 'GetProductComments':
     echo json_encode($data);
     break;
 }     
+
+function getAddress($SessionKey, $conn, $sd = 'ClientAddress'){
+    $colums = "id As ClientAddressID, ";
+                $colums .= "idUser As ClientID, ";
+                $colums .= "type_address As Address, ";
+                $colums .= "apt As Suit, ";
+                $colums .= "city As City, ";
+                $colums .= "state As State, ";
+                $colums .= "zipcode As ZIPCode, ";
+                $colums .= "cross_street As CrossStreet, ";
+                $colums .= "phone As Phone, ";
+                $colums .= "id As AddressName, ";
+                $colums .= "created_at As CreationDate, ";
+                $colums .= "direcciones_clientes.default As 'Default', ";
+                $colums .= "id As 'Enable'"; //pendiente
+                //echo $sql;
+                try {
+                    $sql = "select ".$colums." from direcciones_clientes where iduser=".$SessionKey."";
+                    $stmt = $conn->query($sql);
+                    if($stmt){
+                        $result = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                        $data = array(
+                            'Success' => 'true',
+                            $sd => $result,
+                        );
+                    }else{
+                        $data=["errorResponse"=>"query error DB"] ;                            
+                    }
+
+                    header ('Content-Type: application/json');
+                    
+                } catch (Exception $e) {
+                    header ('Content-Type: application/json');
+                }
+                return ($data);
+}
