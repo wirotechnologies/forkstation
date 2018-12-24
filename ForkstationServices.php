@@ -1,8 +1,8 @@
 <?php
-
+include_once("vendor/paragonie/random_compat/lib/random.php");
+session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
-
 $address = $_POST['address'];
     //$address = "48 Southwest 12th Street, Miami, FL, USA";
 
@@ -234,13 +234,17 @@ $address = $_POST['address'];
             break;
 
             case 'ValidateUser':  
-
+                
                 $conn = getConnection ();
                 $tokenface = $_REQUEST["FacebookToken"];
                 if (!empty($_REQUEST["FacebookToken"])) {
-                    $sql = "select users.UserID AS ClientID, oauth_identities.user_id As usuarioID, users.username AS UserName, users.password AS Password, users.email AS eMail, users.phone AS Cellphone, users.created_at As CreationDate,  users.id_profile from oauth_identities, users where access_token='$tokenface' and users.id=oauth_identities.user_id";    
+                    $sql = "select id as usuID, users.UserID AS ClientID, oauth_identities.user_id As usuarioID, users.username AS UserName, users.password AS Password, users.email AS eMail, users.phone AS Cellphone, users.created_at As CreationDate,  users.id_profile from oauth_identities, users where access_token='$tokenface' and users.id=oauth_identities.user_id";    
                     $stmt = $conn->query ($sql);
                     $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                    if($stmt){
+                        $_SESSION["_token"] = key_random(60);
+                        $conn->query ("update users set remember_token = ".$_SESSION["_token"]." where id=".$data[0]["usuID"]);
+                    }
                     $sql2 = "select concat_ws(', ', payments_profiles.last_name,  payments_profiles.first_name) As FullName, address AS Address from payments_profiles where payments_profiles.id_profile =".$data[0]["id_profile"]."";    
                     $stmt2 = $conn->query ($sql2);
                     $data2 = $stmt2->fetchAll (PDO::FETCH_ASSOC);
@@ -256,10 +260,13 @@ $address = $_POST['address'];
                             $paymentData[$key] = $value;
                         }
                     }
+                    $_SESSION["idUser"] = $data[0]["usuID"];
+                    session_id ($_SESSION["_token"]);
+
                     $sessionR = array(
-                        "SessionKey"=>"",
+                        "SessionKey"=>$_SESSION["_token"],
                         "TimeExpiration"=>"",
-                        "ClientID"=>"",
+                        "ClientID"=>$_SESSION["idUser"],
                     );
                     array_push($data, $paymentData);
                     $response = array("User" => $data[0], "Session" => $sessionR);
@@ -273,9 +280,13 @@ $address = $_POST['address'];
                     */
                     $email = $_REQUEST["mail"];
                     $password = $_REQUEST["password"];
-                    $sql = "select users.UserID AS ClientID, users.username AS UserName, users.password AS Password, users.email AS eMail, users.phone AS Cellphone, users.created_at As CreationDate,  users.id_profile from users where users.email='$email' and users.password='$password'";
+                    $sql = "select id as usuID, users.UserID AS ClientID, users.username AS UserName, users.password AS Password, users.email AS eMail, users.phone AS Cellphone, users.created_at As CreationDate,  users.id_profile from users where users.email='$email' and users.password='$password'";
                     $stmt = $conn->query ($sql);
                     $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                    if($stmt){
+                        $_SESSION["_token"] = key_random(60);
+                        $conn->query ("update users set remember_token = '".$_SESSION["_token"]."' where id=".$data[0]["usuID"]);
+                    }
                     $sql2 = "select concat_ws(', ', payments_profiles.last_name,  payments_profiles.first_name) As FullName, address AS Address from payments_profiles where payments_profiles.id_profile =".$data[0]["id_profile"]."";    
                     $stmt2 = $conn->query ($sql2);
                     $data2 = $stmt2->fetchAll (PDO::FETCH_ASSOC);
@@ -291,11 +302,19 @@ $address = $_POST['address'];
                             $paymentData[$key] = $value;
                         }
                     }
+                    try {
+                        
+                    
+                    $_SESSION["idUser"] = $data[0]["usuID"];
+
                     $sessionR = array(
-                        "SessionKey"=>"key_s",
-                        "TimeExpiration"=>"",
-                        "ClientID"=>"",
+                        "SessionKey"=>$_SESSION["_token"],
+                        "TimeExpiration"=>"15",
+                        "ClientID"=>$_SESSION["idUser"],
                     );
+                    } catch (Exception $e) {
+                        echo $e->getMessage();
+                    }
                     array_push($data[0], $paymentData);
                     $response = array("User" => $data[0], "Session" => $sessionR);
                     header ('Content-Type: application/json');
@@ -327,6 +346,38 @@ $address = $_POST['address'];
                 break;
             
             case 'GetOrder':
+                $getID = $_REQUEST["orderid"];
+                $sql1 = "select orders.id as OrderID,
+                 orderNum as OrderNum,
+                 idrestaurant as RestaurantID,
+                 idclient as ClientID,
+                 total_price as TotalPriceOrder,
+                 paid as Paid,
+                 orders.created_at as CreationDate,
+                 payment_date as PaymentDate,
+                 payment_type as PaymentType,
+                 base_price as BasePriceOrder,
+                 tax_order as TaxOrder,
+                 tip as Tip,
+                 delivery_address as DeliveryAddressStr,
+                 cupon_id as Cupon,
+                 discount_value as DiscountValue,
+                 base_price_discount as BasePriceOrderAferDiscount,
+                 total_price_discount as TotalPriceOrderComplete,
+                 schedule as Schedule,
+                 order_type as OrderType,
+                 auth_code asReceiptLink,
+                 delivery_fee as DeliveryFee,
+                 restaurants.* from orders, restaurants where orders.id = $getID and orders.idrestaurant=restaurants.id
+";
+
+                $sql2 = "select 
+                quality as Quality,
+                value as ProductTotalValue
+                idproduct as Product_ID
+                from order_detail where idorder = $getID";
+                //$stmt = $conn->query ($sql1);
+                //$data = $stmt->fetchAll (PDO::FETCH_ASSOC);
                 header ('Content-Type: application/json');
                 echo json_encode(
                     array(
@@ -350,7 +401,7 @@ $address = $_POST['address'];
                             'TotalPriceOrderComplete'=>'',
                             'Schedule'=>'',
                             'OrderType'=>'',
-                            'ProductOrder'=>array(
+                            'ProductOrder'=>[array( //order_details
                                 'Quantity'=>'',
                                 'ProductTotalValue'=>'',
                                 'Product'=>array(
@@ -388,11 +439,32 @@ $address = $_POST['address'];
                                                 ),
                                             ),
                                         ),
+                                        array(
+                                            'ProductPropertyID'=>'',
+                                            'ProductID'=>'',
+                                            'FatherProductPropertyID'=>'',
+                                            'Name'=>'',
+                                            'PropertyType'=>'',
+                                            'GroupingTypeID'=>'',
+                                            'GroupingType'=>'',
+                                            'PropertyValueCart'=>array(
+                                                array(
+                                                    'PropertyValueID'=>'',
+                                                    'ProductPropertyID'=>'',
+                                                    'ProductID'=>'',
+                                                    'Label'=>'',
+                                                    'Price'=>'',
+                                                    'Cant'=>'',
+                                                    'TotalPrice'=>'',
+
+                                                ),
+                                            ),
+                                        ),
 
                                     ),
                                 ),
 
-                            ),
+                            )],
                             'ReceiptLink'=>'',
                             'DeliveryFee'=>'',
 
@@ -455,41 +527,60 @@ $address = $_POST['address'];
                 );
                 break;
             case 'AddClientAddress':
-
+                
+                
                 $SessionKey = $_REQUEST['SessionKey'];
-                $Address = $_REQUEST['Address'];
-                $Suit = $_REQUEST['Suit'];
-                $City = $_REQUEST['City'];
-                $State = $_REQUEST['State'];
-                $ZIPCode = $_REQUEST['ZIPCode'];
-                $CrossStreet = $_REQUEST['CrossStreet'];
-                $Phone = $_REQUEST['Phone'];
-                $AddressName = $_REQUEST['AddressName'];
 
-                $conn = getConnection ();
-                    $sql = "insert into direcciones_clientes (idUser, type_address, address, apt, zipcode, city, state, cross_street, phone, direcciones_clientes.default) values ($SessionKey, '$AddressName', '$Address', '$Suit', '$ZIPCode', '$City', '$State', '$CrossStreet', '$Phone', 1)";
-                    //echo $sql;
-                    try {
-                        $conn->beginTransaction();
-                        $conn->exec($sql);
-                        $conn->commit();
+                if($_SESSION["_token"] == $SessionKey){
+                    $Address = $_REQUEST['Address'];
+                    $Suit = $_REQUEST['Suit'];
+                    $City = $_REQUEST['City'];
+                    $State = $_REQUEST['State'];
+                    $ZIPCode = $_REQUEST['ZIPCode'];
+                    $CrossStreet = $_REQUEST['CrossStreet'];
+                    $Phone = $_REQUEST['Phone'];
+                    $AddressName = $_REQUEST['AddressName'];
+
+                    $conn = getConnection ();
+                        $sql = "insert into direcciones_clientes (idUser, type_address, address, apt, zipcode, city, state, cross_street, phone, direcciones_clientes.default) values ($SessionKey, '$AddressName', '$Address', '$Suit', '$ZIPCode', '$City', '$State', '$CrossStreet', '$Phone', 1)";
                         //echo $sql;
-                    } catch (Exception $e) {
-                      $conn->rollBack();
-                      //echo "Failed: " . $e->getMessage();
-                    }
-                    //$stmt = $conn->query ($sql);
-                    //$data1 = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                        try {
+                            $conn->beginTransaction();
+                            $conn->exec($sql);
+                            $conn->commit();
+                            //echo $sql;
+                        } catch (Exception $e) {
+                          $conn->rollBack();
+                          //echo "Failed: " . $e->getMessage();
+                        }
+                        //$stmt = $conn->query ($sql);
+                        //$data1 = $stmt->fetchAll (PDO::FETCH_ASSOC);
 
-               $data = getAddress($SessionKey, $conn);
+                    $data = getAddress($_SESSION["idUser"], $conn);
+                }else{
+                    $data = array("Success" => "false");
+                }
                echo json_encode($data);
 
 
                 break;
 
-            case 'CreateShoppingCart':
-                header ('Content-Type: application/json');
+            case 'CreateShoppingCart':  //pendiente
 
+                $sessionk = $_REQUEST["SessionKey"];
+                $options = $_REQUEST["options"];
+                $items = $_REQUEST["items"];
+
+                $sqlID = "select max(id) as id from orders";
+                $conn = getConnection ();
+                $stmt = $conn->query ($sqlID);
+                $id = $stmt->fetchAll (PDO::FETCH_ASSOC);
+               
+                $idOrderNew = $id[0]["id"] + 1;
+                $typeOrder = ['delivery' => 2];
+                $sql1 = "insert into orders (id, order_type, idclient, orderNum, created_at, updated_at, base_price, total_price, estado, idrestaurant) values ($idOrderNew, 1, $sessionk, '".date('Ymdhms') + rand(1,999)."', '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 0, 0, 0, ".$options["id"].")";
+
+                header ('Content-Type: application/json');
                 $data=array(
                     "TotalValuePreorder" => "2",
                     "BaseValuePreorder" => "2",
@@ -818,10 +909,14 @@ $address = $_POST['address'];
                     echo json_encode($data);
                     break;
             case 'GetUserAddress':
+                
+                //echo "ls".$_SESSION["idUser"];
                 $sessionk = $_REQUEST["SessionKey"];
-                    $conn = getConnection();
-                    $data = getAddress($sessionk, $conn, 'ClientAddressOut');
-               echo json_encode($data);
+                $id = getIDByToken($sessionk);
+                $conn = getConnection();
+                $data = getAddress($id, $conn, 'ClientAddressOut');
+                $data["codeerr"] = "campo: ".$_SESSION["idUser"].$_SESSION["_token"]."++".session_id ();
+                echo json_encode($data);
 
                 
                 break;
@@ -1201,6 +1296,10 @@ case 'ChangePassword':
     echo json_encode($data);
     break;
 case 'ClientLogOut':
+    session_unset(); 
+
+    // destroy the session 
+    session_destroy(); 
     $data = [
         "Success" => "Success Process",
         "ErrMessage" => "Message Error",
@@ -1501,6 +1600,7 @@ case 'GetProductComments':
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;
+
 }     
 
 function getAddress($SessionKey, $conn, $sd = 'ClientAddress'){
@@ -1534,7 +1634,29 @@ function getAddress($SessionKey, $conn, $sd = 'ClientAddress'){
                     header ('Content-Type: application/json');
                     
                 } catch (Exception $e) {
+                        $data=["errorResponse"=>"query error DB"] ;                            
                     header ('Content-Type: application/json');
                 }
                 return ($data);
+}
+function key_random($length = 16)
+{
+    $string = '';
+
+    while (($len = strlen($string)) < $length) {
+        $size = $length - $len;
+
+        $bytes = random_bytes($size);
+
+        $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
+    }
+
+    return $string;
+}
+function getIDByToken($sessionk){
+    $sqlID = "select id from users where remember_token = '".$sessionk."'";
+                $conn = getConnection ();
+                $stmt = $conn->query ($sqlID);
+                $id = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                return $id[0]["id"];
 }
