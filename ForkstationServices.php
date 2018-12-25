@@ -571,6 +571,7 @@ $address = $_POST['address'];
                 $options = $_REQUEST["options"];
                 $items = $_REQUEST["items"];
 
+                $clientId = getIDByToken($sessionk);
                 $sqlID = "select max(id) as id from orders";
                 $conn = getConnection ();
                 $stmt = $conn->query ($sqlID);
@@ -578,13 +579,93 @@ $address = $_POST['address'];
                
                 $idOrderNew = $id[0]["id"] + 1;
                 $typeOrder = ['delivery' => 2];
-                $sql1 = "insert into orders (id, order_type, idclient, orderNum, created_at, updated_at, base_price, total_price, estado, idrestaurant) values ($idOrderNew, 1, $sessionk, '".date('Ymdhms') + rand(1,999)."', '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', 0, 0, 0, ".$options["id"].")";
 
+                $total = 0;
+                foreach ($items as $value) {
+                    $total += $value["quantity"]*$value["productvalue"];
+                }
+                $sql1 = "insert into orders (id, order_type, idclient, orderNum, created_at, updated_at, base_price, total_price, estado, idrestaurant, token) values ($idOrderNew, 1, $clientId, '".(date('Ymdhms') + rand(1,999))."', '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', $total, $total, 0, ".$options["id"].", '".key_random(40)."')";
+                try {
+                    $conn->beginTransaction();
+                    $conn->exec($sql1);
+                    $conn->commit();
+                    //echo $sql;
+                } catch (Exception $e) {
+                  $conn->rollBack();
+                  //echo "Failed: " . $e->getMessage();
+                }
+                foreach ($items as $value) {
+                    $sql2 = "insert into order_detail (idorder, type, idproduct, quantity, value, created_at, updated_at) values ($idOrderNew, 1, ".$value["productid"].", ".$value["quantity"].", ".$value["productvalue"].", '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
+                        //$id = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                    try {
+                        $conn->beginTransaction();
+                        $conn->exec($sql2);
+                        $conn->commit();
+                        //echo $sql;
+                    } catch (Exception $e) {
+                      $conn->rollBack();
+                      //echo "Failed: " . $e->getMessage();
+                    }
+                }
+
+                //$conn = getConnection ();
+                $orderSQL = "SELECT orders.total_price as TotalValuePreorder, 
+                orders.base_price as BaseValuePreorder,
+                orders.tax_order as TaxValuePreorder,
+                orders.id as PreOrderID from orders WHERE orders.id = $idOrderNew";
+                $stmt = $conn->query ($orderSQL);
+                $orderData = $stmt->fetchAll (PDO::FETCH_ASSOC);
+
+                $productOrderSQL = "SELECT id,
+                 idorder,
+                 idproduct,
+                 quantity as Quantity,
+                 value,
+                 created_at,
+                 updated_at,
+                 (quantity*value) as ProductTotalValue from order_detail where idorder = $idOrderNew";
+                $stmt = $conn->query ($productOrderSQL);
+                $productOrderData = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                $orderData[0]["ProductOrder"] = array();
+                foreach ($productOrderData as $key => $value) {
+                    if(isset($value["idproduct"])){
+                        $idProduct = $value["idproduct"];
+                        $productSQL = "SELECT id, idcategoria, name, description, value, 'order', created_at from menu_dishes where menu_dishes.id = $idProduct";
+                        $stmt = $conn->query ($productSQL);
+                        $productData = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                        $productData[0]["ProductPropertyCart"] = array(array(
+                                        "ProductPropertyID" => "2222",
+                                        "ProductID" => "2222",
+                                        "FatherProductPropertyID" => "2222",
+                                        "Name" => "2222",
+                                        "PropertyType" => "2222",
+                                        "GroupingTypeID" => "2222",
+                                        "GroupingType" => "2222",
+                                        "PropertyValueCart" => array(array(
+                                            "PropertyValueID" => "22222",
+                                            "ProductPropertyID" => "22222",
+                                            "ProductID" => "22222",
+                                            "Label" => "22222",
+                                            "Price" => "22222",
+                                            "Cant" => "22222",
+                                            "TotalPrice" => "22222",
+                                        )),
+                                    ));
+                        $productOrderData[$key]["Product"] = array();
+                        $productOrderData[$key]["Product"] = $productData[0];
+                        array_push($orderData[0]["ProductOrder"], $productOrderData[$key] );
+                    }
+                    //var_dump($productOrderData);
+                }
+               // var_dump($productOrderData);
+                //array_push($orderData[0]["ProductOrder"], $productOrderData[1] );
+                
                 header ('Content-Type: application/json');
+                /*
                 $data=array(
-                    "TotalValuePreorder" => "2",
-                    "BaseValuePreorder" => "2",
-                    "TaxValuePreorder" => "2",
+                    "TotalValuePreorder" => 2,
+                    "BaseValuePreorder" => 2,
+                    "TaxValuePreorder" => 0,
                     "RestaurantDeliveryFee" => "2",
                     "PreOrderID" => "2",
                     "ProductOrder"=> array(
@@ -626,7 +707,9 @@ $address = $_POST['address'];
                         ),
                     ),
                 );
-                echo json_encode($data);
+                */
+                //echo json_encode($data);
+                echo json_encode($orderData[0]);
 
                 break;
 
