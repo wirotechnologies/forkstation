@@ -347,7 +347,9 @@ $address = $_POST['address'];
             
             case 'GetOrder':
                 $getID = $_REQUEST["orderid"];
-                $sql1 = "select orders.id as OrderID,
+                
+                $conn = getConnection ();
+                $orderSQL = "SELECT orders.id as OrderID,
                  orderNum as OrderNum,
                  idrestaurant as RestaurantID,
                  idclient as ClientID,
@@ -367,17 +369,100 @@ $address = $_POST['address'];
                  schedule as Schedule,
                  order_type as OrderType,
                  auth_code asReceiptLink,
-                 delivery_fee as DeliveryFee,
-                 restaurants.* from orders, restaurants where orders.id = $getID and orders.idrestaurant=restaurants.id
-";
-
+                 delivery_fee as DeliveryFee
+                  from orders where orders.id = $getID";
+/*
                 $sql2 = "select 
                 quality as Quality,
                 value as ProductTotalValue
                 idproduct as Product_ID
                 from order_detail where idorder = $getID";
+                */
                 //$stmt = $conn->query ($sql1);
                 //$data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                 //$conn = getConnection ();
+                /*
+                $orderSQL = "SELECT orders.total_price as TotalValuePreorder, 
+                orders.base_price as BaseValuePreorder,
+                orders.tax_order as TaxValuePreorder,
+                orders.id as PreOrderID from orders WHERE orders.id = $getID";
+                */
+                $stmt = $conn->query ($orderSQL);
+                $orderData = $stmt->fetchAll (PDO::FETCH_ASSOC);
+
+                $productOrderSQL = "SELECT id,
+                 idorder,
+                 idproduct,
+                 quantity as Quantity,
+                 value,
+                 created_at,
+                 updated_at,
+                 (quantity*value) as ProductTotalValue from order_detail where idorder = $getID";
+                $stmt2 = $conn->query ($productOrderSQL);
+                $productOrderData = $stmt2->fetchAll (PDO::FETCH_ASSOC);
+                $orderData[0]["ProductOrder"] = array();
+                foreach ($productOrderData as $key => $value) {
+                    if(isset($value["idproduct"])){
+                        $idProduct = $value["idproduct"];
+                        $productSQL = "SELECT id, idcategoria, name, description, value, 'order', created_at from menu_dishes where menu_dishes.id = $idProduct";
+                        $stmt3 = $conn->query ($productSQL);
+                        $productData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
+                        $productData[0]["ProductPropertyCart"] = array(array(
+                                        "ProductPropertyID" => "2222",
+                                        "ProductID" => "2222",
+                                        "FatherProductPropertyID" => "2222",
+                                        "Name" => "2222",
+                                        "PropertyType" => "2222",
+                                        "GroupingTypeID" => "2222",
+                                        "GroupingType" => "2222",
+                                        "PropertyValueCart" => array(array(
+                                            "PropertyValueID" => "22222",
+                                            "ProductPropertyID" => "22222",
+                                            "ProductID" => "22222",
+                                            "Label" => "22222",
+                                            "Price" => "22222",
+                                            "Cant" => "22222",
+                                            "TotalPrice" => "22222",
+                                        )),
+                                    ));
+                        $productOrderData[$key]["Product"] = array();
+                        $productOrderData[$key]["Product"] = $productData[0];
+                        array_push($orderData[0]["ProductOrder"], $productOrderData[$key] );
+                    }
+                    //var_dump($productOrderData);
+                }
+               // var_dump($productOrderData);
+                //array_push($orderData[0]["ProductOrder"], $productOrderData[1] );
+                $restaurantData = [];
+                if ($stmt) {
+                    $restautantIdOrder = $orderData[0]["RestaurantID"];
+                    $restaurantSQL = "SELECT id as RestaurantID,
+                    restaurant_chain as RestaurantChainID,
+                    name as Name,
+                    description as Description,
+                    image as Image,
+                    delivery_area as DeliveryArea,
+                    address as Address,
+                    phone_rest as Phone,
+                    rating as Rate,
+                    citytax as Tax,
+                    longitud as Longitude,
+                    latitud as Latitude,
+                    zipcode as Zip,
+                    distance as Distance,
+                    web as Web,
+                    created_at as CreationDate,
+                    delivery as Delivery,
+                    pickup as Pickup,
+                    YelpID as YelpId
+                    from restaurants where id = $restautantIdOrder
+                    ";
+                    $stmt4 = $conn->query ($restaurantSQL);
+                    $restaurantData = $stmt4->fetchAll (PDO::FETCH_ASSOC);
+                }
+                header ('Content-Type: application/json');
+                echo json_encode(array("order" => $orderData[0], "Restaurant"=> $restaurantData[0]));
+                /*
                 header ('Content-Type: application/json');
                 echo json_encode(
                     array(
@@ -475,16 +560,16 @@ $address = $_POST['address'];
                             'Name'=>'',
                             'Description'=>'',
                             'Image'=>'',
-                            'Tips'=>'',
+                            'Tips'=>'', //
                             'DeliveryArea'=>'',
-                            'DeliveryTime'=>'',
-                            'OurKitchen'=>'',
+                            'DeliveryTime'=>'', // faltante
+                            'OurKitchen'=>'', //
                             'Address'=>'',
                             'Phones'=>'',
                             'Rate'=>'',
-                            'MinimumOrder'=>'',
-                            'Tax'=>'',
-                            'DeliveryCost'=>'',
+                            'MinimumOrder'=>'', // faltante
+                            'Tax'=>'', 
+                            'DeliveryCost'=>'', // faltante
                             'Longitude'=>'',
                             'Latitude'=>'',
                             'Zip'=>'',
@@ -493,9 +578,9 @@ $address = $_POST['address'];
                             'CreationDate'=>'',
                             'Delivery'=>'',
                             'Pickup'=>'',
-                            'Enable'=>'',
+                            'Enable'=>'', // faltante
                             'YelpId'=>'',
-                            'Dividends_percent'=>'',
+                            'Dividends_percent'=>'', // faltante
                             'Filters'=>array(
                                 'Delivery'=>'',
                                 'Pickup'=>'',
@@ -525,6 +610,7 @@ $address = $_POST['address'];
                         )
                     )
                 );
+                */
                 break;
             case 'AddClientAddress':
                 
