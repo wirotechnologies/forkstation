@@ -371,7 +371,7 @@ $address = $_POST['address'];
                  auth_code asReceiptLink,
                  delivery_fee as DeliveryFee
                   from orders where orders.id = $getID";
-/*
+                /*
                 $sql2 = "select 
                 quality as Quality,
                 value as ProductTotalValue
@@ -461,7 +461,7 @@ $address = $_POST['address'];
                     $restaurantData = $stmt4->fetchAll (PDO::FETCH_ASSOC);
                 }
                 header ('Content-Type: application/json');
-                echo json_encode(array("order" => $orderData[0], "Restaurant"=> $restaurantData[0]));
+                echo json_encode(array("Order" => $orderData[0], "Restaurant"=> $restaurantData[0]));
                 /*
                 header ('Content-Type: application/json');
                 echo json_encode(
@@ -800,7 +800,113 @@ $address = $_POST['address'];
                 break;
 
             case 'GetOrderRecalcPay':
-                $data = array(
+                $addressRecal = json_encode($_REQUEST["address"]);
+                $ordertypeRecal = $_REQUEST["ordertype"];
+                if($ordertypeRecal == 'delivery'){
+                    $ordertypeRecal = 2;
+                }else if($ordertypeRecal == 'pickup'){
+                    $ordertypeRecal = 1;
+
+                }
+                $orderidRecal = $_REQUEST["orderid"];
+
+                $conn = getConnection ();
+
+                $updateOrderSQL = "UPDATE orders set order_type = $ordertypeRecal, delivery_address = '$addressRecal' where id = $orderidRecal";
+                $updateTable = $conn->query ($updateOrderSQL);
+                $data = [];
+                if ($updateTable) {
+                    //get updates data
+                    $orderSQL = "SELECT orders.id as OrderID,
+                     orderNum as OrderNum,
+                     idrestaurant as RestaurantID,
+                     idclient as ClientID,
+                     total_price as TotalPriceOrder,
+                     paid as Paid,
+                     orders.created_at as CreationDate,
+                     payment_date as PaymentDate,
+                     payment_type as PaymentType,
+                     base_price as BasePriceOrder,
+                     tax_order as TaxOrder,
+                     tip as Tip,
+                     delivery_address as DeliveryAddressStr,
+                     cupon_id as Cupon,
+                     discount_value as DiscountValue,
+                     base_price_discount as BasePriceOrderAferDiscount,
+                     total_price_discount as TotalPriceOrderComplete,
+                     schedule as Schedule,
+                     order_type as OrderType,
+                     auth_code asReceiptLink,
+                     delivery_fee as DeliveryFee
+                      from orders where orders.id = $orderidRecal";
+                    /*
+                    $sql2 = "select 
+                    quality as Quality,
+                    value as ProductTotalValue
+                    idproduct as Product_ID
+                    from order_detail where idorder = $orderidRecal";
+                    */
+                    //$stmt = $conn->query ($sql1);
+                    //$data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                     //$conn = getConnection ();
+                    /*
+                    $orderSQL = "SELECT orders.total_price as TotalValuePreorder, 
+                    orders.base_price as BaseValuePreorder,
+                    orders.tax_order as TaxValuePreorder,
+                    orders.id as PreOrderID from orders WHERE orders.id = $orderidRecal";
+                    */
+                    $stmt = $conn->query ($orderSQL);
+                    $orderData = $stmt->fetchAll (PDO::FETCH_ASSOC);
+
+                    $productOrderSQL = "SELECT id,
+                     idorder,
+                     idproduct,
+                     quantity as Quantity,
+                     value,
+                     created_at,
+                     updated_at,
+                     (quantity*value) as ProductTotalValue from order_detail where idorder = $orderidRecal";
+                    $stmt2 = $conn->query ($productOrderSQL);
+                    $productOrderData = $stmt2->fetchAll (PDO::FETCH_ASSOC);
+                    $orderData[0]["ProductOrder"] = array();
+                    foreach ($productOrderData as $key => $value) {
+                        if(isset($value["idproduct"])){
+                            $idProduct = $value["idproduct"];
+                            $productSQL = "SELECT id, idcategoria, name, description, value, 'order', created_at from menu_dishes where menu_dishes.id = $idProduct";
+                            $stmt3 = $conn->query ($productSQL);
+                            $productData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
+                            $productData[0]["ProductPropertyCart"] = array(array(
+                                            "ProductPropertyID" => "2222",
+                                            "ProductID" => "2222",
+                                            "FatherProductPropertyID" => "2222",
+                                            "Name" => "2222",
+                                            "PropertyType" => "2222",
+                                            "GroupingTypeID" => "2222",
+                                            "GroupingType" => "2222",
+                                            "PropertyValueCart" => array(array(
+                                                "PropertyValueID" => "22222",
+                                                "ProductPropertyID" => "22222",
+                                                "ProductID" => "22222",
+                                                "Label" => "22222",
+                                                "Price" => "22222",
+                                                "Cant" => "22222",
+                                                "TotalPrice" => "22222",
+                                            )),
+                                        ));
+                            $productOrderData[$key]["Product"] = array();
+                            $productOrderData[$key]["Product"] = $productData[0];
+                            array_push($orderData[0]["ProductOrder"], $productOrderData[$key] );
+                        }
+                        //var_dump($productOrderData);
+                    }
+                    $data["Success"] = "true";
+                    $data["Order"] = $orderData[0];
+                }else{
+                    $data["ErrMessage"] = "Error Model Conect";
+
+                }
+                /*
+            $data = array(
                 'ErrMessage' => "Error Model Conect",
                 'Success' => "true",
                 "Order"=>array(
@@ -860,11 +966,12 @@ $address = $_POST['address'];
                         ),
                         "Instructions" => "33",
                     )),
-                    'ReceiptLink'=>'3',
-                    'DeliveryFee'=>'3',
+                    'ReceiptLink'=>'3', // 
+                    'DeliveryFee'=>'3', // 
                     ),
 
                 );
+                */
                 header ('Content-Type: application/json');
                 echo json_encode($data);
 
