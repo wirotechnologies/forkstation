@@ -1045,6 +1045,11 @@ $address = $_POST['address'];
                 break;
 
             case 'GetClientPayments':
+                $user_token = $_REQUEST["SessionKey"];
+                $clientPaymentSQL = "SELECT payments_profiles.first_name as First, payments_profiles.last_name as Last, payments_profiles.address as Street, payments_profiles.city as City, payments_profiles.state as State, payments_profiles.zipcode as Zip from payments_profiles, users where remember_token='$user_token' and users.id_profile=payments_profiles.id_profile";
+                $conn = getConnection();
+
+                $stmt3 = $conn->query ($clientPaymentSQL);
                 $data = array(
                     "TcOut" => array(array(
                         "CardType" => "5",
@@ -1061,6 +1066,15 @@ $address = $_POST['address'];
                         ),
                     )),
                 );
+                if($stmt3){
+                    $clientPaymentData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
+                    if(count($clientPaymentData)>0){
+                        $data["TcOut"]["BillingInfo"] = $clientPaymentData[0];
+                    }
+                }else{
+                    echo "error";
+                }
+
                 header ('Content-Type: application/json');
                 echo json_encode($data);
                 
