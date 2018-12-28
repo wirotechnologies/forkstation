@@ -978,98 +978,203 @@ $address = $_POST['address'];
                 break;
 
             case 'SetTipsAndDiscount':
-                $data = array(
-                    'Order' => array(
-                        "OrderID" => "4",
-                        "OrderNum" => "4",
-                        "RestaurantID" => "4",
-                        "ClietID" => "4",
-                        "TotalPriceOrder" => "4",
-                        "Paid" => "4",
-                        "CreationDate" => "4",
-                        "PaymentDate" => "4",
-                        "PaymentType" => "4",
-                        "BasePriceOrder" => "4",
-                        "TaxOrder" => "4",
-                        "Tip" => "4",
-                        "DeliveryAddressStr" => "4",
-                        "Cupon" => "4",
-                        "DiscountValue" => "4",
-                        "BasePriceOrderAferDiscount" => "4",
-                        "TotalPriceOrderComplete" => "4",
-                        "Schedule" => "4",
-                        "OrderType" => "4",
-                        "ProductOrder" => array(array(
-                            "Quantity" =>"44",
-                            "ProductTotalValue" =>"44",
-                            "Product" => array(
-                                "ProductID" => "444",
-                                "Name" => "444",
-                                "Description" => "444",
-                                "ProductImg" => "444",
-                                "Enable" => "444",
-                                "CategoryID" => "444",
-                                "Category" => "444",
-                                "CreationDate" => "444",
-                                "ProductOrder" => "444",
-                                "CategoryOrder" => "444",
-                                "Value" => "444",
-                                "TotalValue" => "444",
-                                "ProductPropertyCart" => array(array(
-                                    "ProductPropertyID" => "4444" ,
-                                    "ProductID" => "4444" ,
-                                    "FatherProductPropertyID" => "4444" ,
-                                    "Name" => "4444" ,
-                                    "PropertyType" => "4444" ,
-                                    "GroupingTypeID" => "4444" ,
-                                    "GroupingType" => "4444" ,
-                                    "PropertyValueCart" => array(array(
-                                        "PropertyValueID" => "44444",
-                                        "ProductPropertyID" => "44444",
-                                        "ProductID" => "44444",
-                                        "Label" => "44444",
-                                        "Price" => "44444",
-                                        "Cant" => "44444",
-                                        "TotalPrice" => "44444",
-                                    )) ,
-                                )),
-                            ),
-                            "Instructions" =>"44",
-                        )),
-                        "ReceipLink" => "4",
-                        "DeliveryFee" => "4",
-                    ),
-                );
+
+                $tips = $_REQUEST["tips"];
+                $tip = $tips["tip"];
+                $orderid = $_REQUEST["orderid"];
+                $clientPaymentSQL = "update orders set tip = $tip where id=$orderid";
+                $conn = getConnection();
+                $stmt3 = $conn->query ($clientPaymentSQL);
+
+                    //$clientPaymentData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
+                    $orderSQL = "SELECT orders.id as OrderID,
+                     orderNum as OrderNum,
+                     idrestaurant as RestaurantID,
+                     idclient as ClientID,
+                     total_price as TotalPriceOrder,
+                     paid as Paid,
+                     orders.created_at as CreationDate,
+                     payment_date as PaymentDate,
+                     payment_type as PaymentType,
+                     base_price as BasePriceOrder,
+                     tax_order as TaxOrder,
+                     tip as Tip,
+                     delivery_address as DeliveryAddressStr,
+                     cupon_id as Cupon,
+                     discount_value as DiscountValue,
+                     base_price_discount as BasePriceOrderAferDiscount,
+                     total_price_discount as TotalPriceOrderComplete,
+                     schedule as Schedule,
+                     order_type as OrderType,
+                     auth_code asReceiptLink,
+                     delivery_fee as DeliveryFee
+                      from orders where orders.id = $orderid";
+                    /*
+                    $sql2 = "select 
+                    quality as Quality,
+                    value as ProductTotalValue
+                    idproduct as Product_ID
+                    from order_detail where idorder = $orderid";
+                    */
+                    //$stmt = $conn->query ($sql1);
+                    //$data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                     //$conn = getConnection ();
+                    /*
+                    $orderSQL = "SELECT orders.total_price as TotalValuePreorder, 
+                    orders.base_price as BaseValuePreorder,
+                    orders.tax_order as TaxValuePreorder,
+                    orders.id as PreOrderID from orders WHERE orders.id = $orderid";
+                    */
+                    $stmt = $conn->query ($orderSQL);
+                    $orderData = $stmt->fetchAll (PDO::FETCH_ASSOC);
+
+                    $productOrderSQL = "SELECT id,
+                     idorder,
+                     idproduct,
+                     quantity as Quantity,
+                     value,
+                     created_at,
+                     updated_at,
+                     (quantity*value) as ProductTotalValue from order_detail where idorder = $orderid";
+                    $stmt2 = $conn->query ($productOrderSQL);
+                    $productOrderData = $stmt2->fetchAll (PDO::FETCH_ASSOC);
+                    $orderData[0]["ProductOrder"] = array();
+                    foreach ($productOrderData as $key => $value) {
+                        if(isset($value["idproduct"])){
+                            $idProduct = $value["idproduct"];
+                            $productSQL = "SELECT id, idcategoria, name, description, value, 'order', created_at from menu_dishes where menu_dishes.id = $idProduct";
+                            $stmt3 = $conn->query ($productSQL);
+                            $productData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
+                            $productData[0]["ProductPropertyCart"] = array(array(
+                                            "ProductPropertyID" => "2222",
+                                            "ProductID" => "2222",
+                                            "FatherProductPropertyID" => "2222",
+                                            "Name" => "2222",
+                                            "PropertyType" => "2222",
+                                            "GroupingTypeID" => "2222",
+                                            "GroupingType" => "2222",
+                                            "PropertyValueCart" => array(array(
+                                                "PropertyValueID" => "22222",
+                                                "ProductPropertyID" => "22222",
+                                                "ProductID" => "22222",
+                                                "Label" => "22222",
+                                                "Price" => "22222",
+                                                "Cant" => "22222",
+                                                "TotalPrice" => "22222",
+                                            )),
+                                        ));
+                            $productOrderData[$key]["Product"] = array();
+                            $productOrderData[$key]["Product"] = $productData[0];
+                            array_push($orderData[0]["ProductOrder"], $productOrderData[$key] );
+                        }
+                        //var_dump($productOrderData);
+                    }
+                    
+                    $data["Order"] = $orderData[0];
+                
+                /*
+                    $data = array(
+                        'Order' => array(
+                            "OrderID" => "4",
+                            "OrderNum" => "4",
+                            "RestaurantID" => "4",
+                            "ClietID" => "4",
+                            "TotalPriceOrder" => "4",
+                            "Paid" => "4",
+                            "CreationDate" => "4",
+                            "PaymentDate" => "4",
+                            "PaymentType" => "4",
+                            "BasePriceOrder" => "4",
+                            "TaxOrder" => "4",
+                            "Tip" => "4",
+                            "DeliveryAddressStr" => "4",
+                            "Cupon" => "4",
+                            "DiscountValue" => "4",
+                            "BasePriceOrderAferDiscount" => "4",
+                            "TotalPriceOrderComplete" => "4",
+                            "Schedule" => "4",
+                            "OrderType" => "4",
+                            "ProductOrder" => array(array(
+                                "Quantity" =>"44",
+                                "ProductTotalValue" =>"44",
+                                "Product" => array(
+                                    "ProductID" => "444",
+                                    "Name" => "444",
+                                    "Description" => "444",
+                                    "ProductImg" => "444",
+                                    "Enable" => "444",
+                                    "CategoryID" => "444",
+                                    "Category" => "444",
+                                    "CreationDate" => "444",
+                                    "ProductOrder" => "444",
+                                    "CategoryOrder" => "444",
+                                    "Value" => "444",
+                                    "TotalValue" => "444",
+                                    "ProductPropertyCart" => array(array(
+                                        "ProductPropertyID" => "4444" ,
+                                        "ProductID" => "4444" ,
+                                        "FatherProductPropertyID" => "4444" ,
+                                        "Name" => "4444" ,
+                                        "PropertyType" => "4444" ,
+                                        "GroupingTypeID" => "4444" ,
+                                        "GroupingType" => "4444" ,
+                                        "PropertyValueCart" => array(array(
+                                            "PropertyValueID" => "44444",
+                                            "ProductPropertyID" => "44444",
+                                            "ProductID" => "44444",
+                                            "Label" => "44444",
+                                            "Price" => "44444",
+                                            "Cant" => "44444",
+                                            "TotalPrice" => "44444",
+                                        )) ,
+                                    )),
+                                ),
+                                "Instructions" =>"44",
+                            )),
+                            "ReceipLink" => "4",
+                            "DeliveryFee" => "4",
+                        ),
+                    );
+                */
                 header ('Content-Type: application/json');
                 echo json_encode($data);
                 break;
 
             case 'GetClientPayments':
                 $user_token = $_REQUEST["SessionKey"];
-                $clientPaymentSQL = "SELECT payments_profiles.first_name as First, payments_profiles.last_name as Last, payments_profiles.address as Street, payments_profiles.city as City, payments_profiles.state as State, payments_profiles.zipcode as Zip from payments_profiles, users where remember_token='$user_token' and users.id_profile=payments_profiles.id_profile";
+                $clientPaymentSQL = "SELECT payments_profiles.id, payments_profiles.id_payment, payments_profiles.first_name as First, payments_profiles.last_name as Last, payments_profiles.address as Street, payments_profiles.city as City, payments_profiles.state as State, payments_profiles.zipcode as Zip from payments_profiles, users where remember_token='$user_token' and users.id_profile=payments_profiles.id_profile";
                 $conn = getConnection();
 
                 $stmt3 = $conn->query ($clientPaymentSQL);
                 $data = array(
                     "TcOut" => array(array(
-                        "CardType" => "5",
-                        "CardExpiration" => "5",
-                        "CardNumber" => "5",
-                        "PaymenProfileID" => "5",
+                        "CardType" => "",
+                        "CardExpiration" => "",
+                        "CardNumber" => "",
+                        "PaymenProfileID" => "",
                         "BillingInfo" => array(
-                            "First" => "55",
-                            "Last" => "55",
-                            "Street" => "55",
-                            "City" => "55",
-                            "State" => "55",
-                            "Zip" => "55",
+                            "First" => "",
+                            "Last" => "",
+                            "Street" => "",
+                            "City" => "",
+                            "State" => "",
+                            "Zip" => "",
                         ),
                     )),
                 );
                 if($stmt3){
                     $clientPaymentData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
                     if(count($clientPaymentData)>0){
-                        $data["TcOut"]["BillingInfo"] = $clientPaymentData[0];
+                        foreach ($clientPaymentData as $key => $value) {
+                            $data["TcOut"][$key]["BillingInfo"]["First"] = $value["First"];                            
+                            $data["TcOut"][$key]["BillingInfo"]["Last"] = $value["Last"];                            
+                            $data["TcOut"][$key]["BillingInfo"]["Street"] = $value["Street"];                            
+                            $data["TcOut"][$key]["BillingInfo"]["City"] = $value["City"];                            
+                            $data["TcOut"][$key]["BillingInfo"]["State"] = $value["State"];                            
+                            $data["TcOut"][$key]["BillingInfo"]["Zip"] = $value["Zip"];  
+                            $data["TcOut"][$key]["PaymenProfileID"] = $value["id"];  
+                            $data["TcOut"][$key]["CardNumber"] = $value["id_payment"];  
+                        }
                     }
                 }else{
                     echo "error";
@@ -1454,10 +1559,39 @@ $address = $_POST['address'];
                 echo json_encode($data);
                 break;
             case 'SetNewCard':
-                $data = [
-                    "Success" => "Success Process",
-                    "ErrMessage" => "Message Error",
-                ];
+                $data = [];
+                $conn = getConnection ();
+                $ssessionk = $_REQUEST["SessionKey"];
+                $cardNumber = $_REQUEST["cardNumber"];
+                $cardCode = $_REQUEST["cardCode"];
+                $FirstName = $_REQUEST["FirstName"];
+                $LastName = $_REQUEST["LastName"];
+                $Address = $_REQUEST["Address"];
+                $City = $_REQUEST["City"];
+                $State = $_REQUEST["State"];
+                $ZipCode = $_REQUEST["ZipCode"];
+                $conn = getConnection();
+                $getProfileIDSQL = "SELECT id_profile from users where remember_token='$ssessionk'";
+                $stmt3 = $conn->query ($getProfileIDSQL);
+                $id_profileData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
+                $id_profile = $id_profileData[0]["id_profile"];
+                if($_REQUEST["update"] == "true"){
+                    $id = $_REQUEST["PaymenProfileID"];
+                    $sql1 = "UPDATE payments_profiles set id_profile=$id_profile, id_payment=$cardNumber, cc_name='$cardCode', first_name='$FirstName', last_name='$LastName', address='$Address', city='$City', state='$State', zipcode='$ZipCode' WHERE id=$id";
+                }else{
+                    $sql1 = "INSERT into payments_profiles (id_profile, id_payment, cc_name, first_name, last_name, address, city, state, zipcode) values ($id_profile, $cardNumber, '$cardCode', '$FirstName', '$LastName', '$Address', '$City', '$State', '$ZipCode')";
+                }
+                try {
+                    $conn->beginTransaction();
+                    $conn->exec($sql1);
+                    $conn->commit();
+                    $data["Success"] = "true";                    
+                    //echo $sql;
+                } catch (Exception $e) {
+                  $conn->rollBack();
+                  $data["ErrMessage"] = "Message Error DB";
+                  //echo "Failed: " . $e->getMessage();
+                }
                 header ('Content-Type: application/json');
                 echo json_encode($data);
                 break; 
@@ -1598,10 +1732,18 @@ case 'ClientLogOut':
     echo json_encode($data);
     break;
 case 'DeleteCard':
-    $data = [
-        "Success" => "Success Process",
-        "ErrMessage" => "Message Error",
-    ];
+    $data = [];
+    $conn = getConnection ();
+
+    $paymenProfileID = $_REQUEST["PaymenProfileID"];
+    $deleteCardSQL = "DELETE from payments_profiles where id = $paymenProfileID";
+    $stmt = $conn->query ($deleteCardSQL);
+    if($stmt){
+        $orderData = $stmt->fetchAll (PDO::FETCH_ASSOC); 
+        $data["Success"] = "true";
+    }else{
+        $data["ErrMessage"] = "Message Error";
+    }
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;

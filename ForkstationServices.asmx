@@ -1217,6 +1217,7 @@ $address = $jsonData->address;
         case 'SetTipsAndDiscount':
             $jsonData = json_decode($obj->Body->SetTipsAndDiscount->JsonSetTipsAndDiscount, true);
             $jsonData["op"] = $op;
+            //$jsonData["orderid"] = $_REQUEST["orderid"];
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $urlServices);
             curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -1227,13 +1228,13 @@ $address = $jsonData->address;
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             $result = curl_exec($ch);
             $data = $result;
-                //echo $data;
+            //    echo $data;
             $data = json_decode($data, true);
                 //var_dump($data);
             $dom = new DOMDocument();
             $mainElement =  $dom->createElement('TipsAndDiscount');
             $orderElement = $dom->createElement('Order');
-            $orderElement = getInsertChildren($dom, $data["Order"], $orderElement);
+            $orderElement = getInsertChildren4($dom, $data["Order"], $orderElement,1);
             $mainElement->appendChild($orderElement);
             $dom->appendChild($mainElement);
             Header('Content-type: text/xml');
@@ -1557,6 +1558,10 @@ $address = $jsonData->address;
             break;
         case 'SetNewCard':
             $jsonData = json_decode($obj->Body->SetNewCard->JsonSetNewCard, true);
+            if(!isset($obj->Body->SetNewCard)){
+                $jsonData = json_decode($obj->Body->UpdateCard->JsonUpdateCard, true);
+                $jsonData["update"]="true";
+            }
             $jsonData["op"] = $op;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $urlServices);
