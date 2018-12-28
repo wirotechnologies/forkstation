@@ -1561,7 +1561,7 @@ $address = $_POST['address'];
             case 'SetNewCard':
                 $data = [];
                 $conn = getConnection ();
-                $ssessionk = $_REQUEST["SessionKey"];
+                $sessionk = $_REQUEST["SessionKey"];
                 $cardNumber = $_REQUEST["cardNumber"];
                 $cardCode = $_REQUEST["cardCode"];
                 $FirstName = $_REQUEST["FirstName"];
@@ -1571,7 +1571,7 @@ $address = $_POST['address'];
                 $State = $_REQUEST["State"];
                 $ZipCode = $_REQUEST["ZipCode"];
                 $conn = getConnection();
-                $getProfileIDSQL = "SELECT id_profile from users where remember_token='$ssessionk'";
+                $getProfileIDSQL = "SELECT id_profile from users where remember_token='$sessionk'";
                 $stmt3 = $conn->query ($getProfileIDSQL);
                 $id_profileData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
                 $id_profile = $id_profileData[0]["id_profile"];

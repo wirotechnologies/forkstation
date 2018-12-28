@@ -1560,7 +1560,7 @@ $address = $jsonData->address;
             $jsonData = json_decode($obj->Body->SetNewCard->JsonSetNewCard, true);
             if(!isset($obj->Body->SetNewCard)){
                 $jsonData = json_decode($obj->Body->UpdateCard->JsonUpdateCard, true);
-                $jsonData["update"]="true";
+                $jsonData["update"] = "true";
             }
             $jsonData["op"] = $op;
             $ch = curl_init();
