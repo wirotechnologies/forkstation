@@ -347,121 +347,15 @@ $address = $_POST['address'];
             
             case 'GetOrder':
                 $getID = $_REQUEST["orderid"];
-                
                 $conn = getConnection ();
-                $orderSQL = "SELECT orders.id as OrderID,
-                 orderNum as OrderNum,
-                 idrestaurant as RestaurantID,
-                 idclient as ClientID,
-                 total_price as TotalPriceOrder,
-                 paid as Paid,
-                 orders.created_at as CreationDate,
-                 payment_date as PaymentDate,
-                 payment_type as PaymentType,
-                 base_price as BasePriceOrder,
-                 tax_order as TaxOrder,
-                 tip as Tip,
-                 delivery_address as DeliveryAddressStr,
-                 cupon_id as Cupon,
-                 discount_value as DiscountValue,
-                 base_price_discount as BasePriceOrderAferDiscount,
-                 total_price_discount as TotalPriceOrderComplete,
-                 schedule as Schedule,
-                 order_type as OrderType,
-                 auth_code asReceiptLink,
-                 delivery_fee as DeliveryFee
-                  from orders where orders.id = $getID";
-                /*
-                $sql2 = "select 
-                quality as Quality,
-                value as ProductTotalValue
-                idproduct as Product_ID
-                from order_detail where idorder = $getID";
-                */
-                //$stmt = $conn->query ($sql1);
-                //$data = $stmt->fetchAll (PDO::FETCH_ASSOC);
-                 //$conn = getConnection ();
-                /*
-                $orderSQL = "SELECT orders.total_price as TotalValuePreorder, 
-                orders.base_price as BaseValuePreorder,
-                orders.tax_order as TaxValuePreorder,
-                orders.id as PreOrderID from orders WHERE orders.id = $getID";
-                */
-                $stmt = $conn->query ($orderSQL);
-                $orderData = $stmt->fetchAll (PDO::FETCH_ASSOC);
-
-                $productOrderSQL = "SELECT id,
-                 idorder,
-                 idproduct,
-                 quantity as Quantity,
-                 value,
-                 created_at,
-                 updated_at,
-                 (quantity*value) as ProductTotalValue from order_detail where idorder = $getID";
-                $stmt2 = $conn->query ($productOrderSQL);
-                $productOrderData = $stmt2->fetchAll (PDO::FETCH_ASSOC);
-                $orderData[0]["ProductOrder"] = array();
-                foreach ($productOrderData as $key => $value) {
-                    if(isset($value["idproduct"])){
-                        $idProduct = $value["idproduct"];
-                        $productSQL = "SELECT id, idcategoria, name, description, value, 'order', created_at from menu_dishes where menu_dishes.id = $idProduct";
-                        $stmt3 = $conn->query ($productSQL);
-                        $productData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
-                        $productData[0]["ProductPropertyCart"] = array(array(
-                                        "ProductPropertyID" => "2222",
-                                        "ProductID" => "2222",
-                                        "FatherProductPropertyID" => "2222",
-                                        "Name" => "2222",
-                                        "PropertyType" => "2222",
-                                        "GroupingTypeID" => "2222",
-                                        "GroupingType" => "2222",
-                                        "PropertyValueCart" => array(array(
-                                            "PropertyValueID" => "22222",
-                                            "ProductPropertyID" => "22222",
-                                            "ProductID" => "22222",
-                                            "Label" => "22222",
-                                            "Price" => "22222",
-                                            "Cant" => "22222",
-                                            "TotalPrice" => "22222",
-                                        )),
-                                    ));
-                        $productOrderData[$key]["Product"] = array();
-                        $productOrderData[$key]["Product"] = $productData[0];
-                        array_push($orderData[0]["ProductOrder"], $productOrderData[$key] );
-                    }
-                    //var_dump($productOrderData);
-                }
+                $oData = getOrderData($getID, $conn);
                // var_dump($productOrderData);
                 //array_push($orderData[0]["ProductOrder"], $productOrderData[1] );
-                $restaurantData = [];
-                if ($stmt) {
-                    $restautantIdOrder = $orderData[0]["RestaurantID"];
-                    $restaurantSQL = "SELECT id as RestaurantID,
-                    restaurant_chain as RestaurantChainID,
-                    name as Name,
-                    description as Description,
-                    image as Image,
-                    delivery_area as DeliveryArea,
-                    address as Address,
-                    phone_rest as Phone,
-                    rating as Rate,
-                    citytax as Tax,
-                    longitud as Longitude,
-                    latitud as Latitude,
-                    zipcode as Zip,
-                    distance as Distance,
-                    web as Web,
-                    created_at as CreationDate,
-                    delivery as Delivery,
-                    pickup as Pickup,
-                    YelpID as YelpId
-                    from restaurants where id = $restautantIdOrder
-                    ";
-                    $stmt4 = $conn->query ($restaurantSQL);
-                    $restaurantData = $stmt4->fetchAll (PDO::FETCH_ASSOC);
+                if (!empty($oData)) {
+                    $rData = getRestaurantData($oData["RestaurantID"], $conn);
                 }
                 header ('Content-Type: application/json');
-                echo json_encode(array("Order" => $orderData[0], "Restaurant"=> $restaurantData[0]));
+                echo json_encode(array("Order" => $oData, "Restaurant"=> $rData));
                 /*
                 header ('Content-Type: application/json');
                 echo json_encode(
@@ -670,7 +564,7 @@ $address = $_POST['address'];
                 foreach ($items as $value) {
                     $total += $value["quantity"]*$value["productvalue"];
                 }
-                $sql1 = "insert into orders (id, order_type, idclient, orderNum, created_at, updated_at, base_price, total_price, estado, idrestaurant, token) values ($idOrderNew, 1, $clientId, '".(date('Ymdhms') + rand(1,999))."', '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', $total, $total, 0, ".$options["id"].", '".key_random(40)."')";
+                $sql1 = "INSERT into orders (id, order_type, idclient, orderNum, created_at, updated_at, base_price, total_price, estado, idrestaurant) values ($idOrderNew, 1, $clientId, '".(date('Ymdhms') + rand(1,999))."', '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."', $total, $total, 0, ".$options["id"].")";
                 try {
                     $conn->beginTransaction();
                     $conn->exec($sql1);
@@ -681,7 +575,7 @@ $address = $_POST['address'];
                   //echo "Failed: " . $e->getMessage();
                 }
                 foreach ($items as $value) {
-                    $sql2 = "insert into order_detail (idorder, type, idproduct, quantity, value, created_at, updated_at) values ($idOrderNew, 1, ".$value["productid"].", ".$value["quantity"].", ".$value["productvalue"].", '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
+                    $sql2 = "INSERT into order_detail (idorder, type, idproduct, quantity, value, created_at, updated_at) values ($idOrderNew, 1, ".$value["productid"].", ".$value["quantity"].", ".$value["productvalue"].", '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
                         //$id = $stmt->fetchAll (PDO::FETCH_ASSOC);
                     try {
                         $conn->beginTransaction();
@@ -987,90 +881,9 @@ $address = $_POST['address'];
                 $stmt3 = $conn->query ($clientPaymentSQL);
 
                     //$clientPaymentData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
-                    $orderSQL = "SELECT orders.id as OrderID,
-                     orderNum as OrderNum,
-                     idrestaurant as RestaurantID,
-                     idclient as ClientID,
-                     total_price as TotalPriceOrder,
-                     paid as Paid,
-                     orders.created_at as CreationDate,
-                     payment_date as PaymentDate,
-                     payment_type as PaymentType,
-                     base_price as BasePriceOrder,
-                     tax_order as TaxOrder,
-                     tip as Tip,
-                     delivery_address as DeliveryAddressStr,
-                     cupon_id as Cupon,
-                     discount_value as DiscountValue,
-                     base_price_discount as BasePriceOrderAferDiscount,
-                     total_price_discount as TotalPriceOrderComplete,
-                     schedule as Schedule,
-                     order_type as OrderType,
-                     auth_code asReceiptLink,
-                     delivery_fee as DeliveryFee
-                      from orders where orders.id = $orderid";
-                    /*
-                    $sql2 = "select 
-                    quality as Quality,
-                    value as ProductTotalValue
-                    idproduct as Product_ID
-                    from order_detail where idorder = $orderid";
-                    */
-                    //$stmt = $conn->query ($sql1);
-                    //$data = $stmt->fetchAll (PDO::FETCH_ASSOC);
-                     //$conn = getConnection ();
-                    /*
-                    $orderSQL = "SELECT orders.total_price as TotalValuePreorder, 
-                    orders.base_price as BaseValuePreorder,
-                    orders.tax_order as TaxValuePreorder,
-                    orders.id as PreOrderID from orders WHERE orders.id = $orderid";
-                    */
-                    $stmt = $conn->query ($orderSQL);
-                    $orderData = $stmt->fetchAll (PDO::FETCH_ASSOC);
-
-                    $productOrderSQL = "SELECT id,
-                     idorder,
-                     idproduct,
-                     quantity as Quantity,
-                     value,
-                     created_at,
-                     updated_at,
-                     (quantity*value) as ProductTotalValue from order_detail where idorder = $orderid";
-                    $stmt2 = $conn->query ($productOrderSQL);
-                    $productOrderData = $stmt2->fetchAll (PDO::FETCH_ASSOC);
-                    $orderData[0]["ProductOrder"] = array();
-                    foreach ($productOrderData as $key => $value) {
-                        if(isset($value["idproduct"])){
-                            $idProduct = $value["idproduct"];
-                            $productSQL = "SELECT id, idcategoria, name, description, value, 'order', created_at from menu_dishes where menu_dishes.id = $idProduct";
-                            $stmt3 = $conn->query ($productSQL);
-                            $productData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
-                            $productData[0]["ProductPropertyCart"] = array(array(
-                                            "ProductPropertyID" => "2222",
-                                            "ProductID" => "2222",
-                                            "FatherProductPropertyID" => "2222",
-                                            "Name" => "2222",
-                                            "PropertyType" => "2222",
-                                            "GroupingTypeID" => "2222",
-                                            "GroupingType" => "2222",
-                                            "PropertyValueCart" => array(array(
-                                                "PropertyValueID" => "22222",
-                                                "ProductPropertyID" => "22222",
-                                                "ProductID" => "22222",
-                                                "Label" => "22222",
-                                                "Price" => "22222",
-                                                "Cant" => "22222",
-                                                "TotalPrice" => "22222",
-                                            )),
-                                        ));
-                            $productOrderData[$key]["Product"] = array();
-                            $productOrderData[$key]["Product"] = $productData[0];
-                            array_push($orderData[0]["ProductOrder"], $productOrderData[$key] );
-                        }
-                        //var_dump($productOrderData);
-                    }
                     
-                    $data["Order"] = $orderData[0];
+                    
+                $data["Order"] = getOrderData($orderid, $conn);
                 
                 /*
                     $data = array(
@@ -1186,122 +999,136 @@ $address = $_POST['address'];
                 break;
 
             case 'CheckOrderStatus':
-                    $data = array(
-                        'Order'=>array(
-                            "OrderID" => "7",
-                            "OrderNum" => "7",
-                            "RestaurantID" => "7",
-                            "ClientID" => "7",
-                            "TotalPriceOrder" => "7",
-                            "Paid" => "7",
-                            "CreationDate" => "7",
-                            "PaymentDate" => "7",
-                            "PaymentType" => "7",
-                            "BasePriceOrder" => "7",
-                            "TaxOrder" => "7",
-                            "Tip" => "7",
-                            "DeliveryAddressStr" => "7",
-                            "Cupon" => "7",
-                            "DiscountValue" => "7",
-                            "BasePriceOrderAferDiscount" => "7",
-                            "TotalPriceOrderComplete" => "7",
-                            "Schedule" => "7",
-                            "OrderType" => "7",
-                            "ProductOrder" => array(array(
-                                "Quantity" => "77",
-                                "ProductTotalValue" => "77",
-                                "Product" => array(
-                                    "ProductID" => "777",
-                                    "Name" => "777",
-                                    "Description" => "777",
-                                    "ProductImg" => "777",
-                                    "Enable" => "777",
-                                    "CategoryID" => "777",
-                                    "Category" => "777",
-                                    "CreationDate" => "777",
-                                    "ProductOrder" => "777",
-                                    "CategoryOrder" => "777",
-                                    "Value" => "777",
-                                    "TotalValue" => "777",
-                                    "ProductPropertyCart" => array(array(
-                                        "ProductPropertyID" => "7777",
-                                        "ProductID" => "7777",
-                                        "FatherProductPropertyID" => "7777",
-                                        "Name" => "7777",
-                                        "PropertyType" => "7777",
-                                        "GroupingTypeID" => "7777",
-                                        "GroupingType" => "7777",
-                                        "PropertyValueCart" => array(array(
-                                            "PropertyValueID" => "77777",
-                                            "ProductPropertyID" => "77777",
-                                            "ProductID" => "77777",
-                                            "Label" => "77777",
-                                            "Price" => "77777",
-                                            "Cant" => "77777",
-                                            "TotalPrice" => "77777",
+                    /*
+                        $data = array(
+                            'Order'=>array(
+                                "OrderID" => "7",
+                                "OrderNum" => "7",
+                                "RestaurantID" => "7",
+                                "ClientID" => "7",
+                                "TotalPriceOrder" => "7",
+                                "Paid" => "7",
+                                "CreationDate" => "7",
+                                "PaymentDate" => "7",
+                                "PaymentType" => "7",
+                                "BasePriceOrder" => "7",
+                                "TaxOrder" => "7",
+                                "Tip" => "7",
+                                "DeliveryAddressStr" => "7",
+                                "Cupon" => "7",
+                                "DiscountValue" => "7",
+                                "BasePriceOrderAferDiscount" => "7",
+                                "TotalPriceOrderComplete" => "7",
+                                "Schedule" => "7",
+                                "OrderType" => "7",
+                                "ProductOrder" => array(array(
+                                    "Quantity" => "77",
+                                    "ProductTotalValue" => "77",
+                                    "Product" => array(
+                                        "ProductID" => "777",
+                                        "Name" => "777",
+                                        "Description" => "777",
+                                        "ProductImg" => "777",
+                                        "Enable" => "777",
+                                        "CategoryID" => "777",
+                                        "Category" => "777",
+                                        "CreationDate" => "777",
+                                        "ProductOrder" => "777",
+                                        "CategoryOrder" => "777",
+                                        "Value" => "777",
+                                        "TotalValue" => "777",
+                                        "ProductPropertyCart" => array(array(
+                                            "ProductPropertyID" => "7777",
+                                            "ProductID" => "7777",
+                                            "FatherProductPropertyID" => "7777",
+                                            "Name" => "7777",
+                                            "PropertyType" => "7777",
+                                            "GroupingTypeID" => "7777",
+                                            "GroupingType" => "7777",
+                                            "PropertyValueCart" => array(array(
+                                                "PropertyValueID" => "77777",
+                                                "ProductPropertyID" => "77777",
+                                                "ProductID" => "77777",
+                                                "Label" => "77777",
+                                                "Price" => "77777",
+                                                "Cant" => "77777",
+                                                "TotalPrice" => "77777",
+                                            )),
                                         )),
-                                    )),
+                                    ),
+                                    "Instructions" => "77"
+                                )),
+                                "ReceiptLink" => "7",
+                                "DeliveryFee" => "7",
+                            ),
+                            "Restaurant" => array(
+                                "RestaurantID" => "7",
+                                "RestaurantChainID" => "7",
+                                "Name" => "7",
+                                "Description" => "7",
+                                "Image" => "7",
+                                "Tips" => "7",
+                                "DeliveryArea" => "7",
+                                "DeliveryTime" => "7",
+                                "OurKitchen" => "7",
+                                "Address" => "7",
+                                "Phones" => "7",
+                                "Rate" => "7",
+                                "MinimumOrder" => "7",
+                                "Tax" => "7",
+                                "DeliveryCost" => "7",
+                                "Longitude" => "7",
+                                "Latitude" => "7",
+                                "Zip" => "7",
+                                "Distance" => "7",
+                                "Web" => "7",
+                                "CreationDate" => "7",
+                                "Delivery" => "7",
+                                "Pickup" => "7",
+                                "Enable" => "7",
+                                "YelpId" => "7",
+                                "Dividends_percent" => "7",
+                                "Filters" => array(
+                                    "Delivery"=> "77",
+                                    "Pickup"=> "77",
+                                    "FreeDelivery"=> "77",
+                                    "OpenNow"=> "77",
+                                    "HaveCoupons"=> "77",
                                 ),
-                                "Instructions" => "77"
-                            )),
-                            "ReceiptLink" => "7",
-                            "DeliveryFee" => "7",
-                        ),
-                        "Restaurant" => array(
-                            "RestaurantID" => "7",
-                            "RestaurantChainID" => "7",
-                            "Name" => "7",
-                            "Description" => "7",
-                            "Image" => "7",
-                            "Tips" => "7",
-                            "DeliveryArea" => "7",
-                            "DeliveryTime" => "7",
-                            "OurKitchen" => "7",
-                            "Address" => "7",
-                            "Phones" => "7",
-                            "Rate" => "7",
-                            "MinimumOrder" => "7",
-                            "Tax" => "7",
-                            "DeliveryCost" => "7",
-                            "Longitude" => "7",
-                            "Latitude" => "7",
-                            "Zip" => "7",
-                            "Distance" => "7",
-                            "Web" => "7",
-                            "CreationDate" => "7",
-                            "Delivery" => "7",
-                            "Pickup" => "7",
-                            "Enable" => "7",
-                            "YelpId" => "7",
-                            "Dividends_percent" => "7",
-                            "Filters" => array(
-                                "Delivery"=> "77",
-                                "Pickup"=> "77",
-                                "FreeDelivery"=> "77",
-                                "OpenNow"=> "77",
-                                "HaveCoupons"=> "77",
+                                "PaymentTypeOut" => array(array(
+                                    "PaymentTypeID" => "77",
+                                    "PaymentType" => "77",
+                                    "Icon" => "77",
+                                    "Enable" => "77",
+                                )),
+                                "ScheduleOut" => array(
+                                    "ScheduleID" => "77",
+                                    "Monday" => "77",
+                                    "Tuesday" => "77",
+                                    "Wednesday" => "77",
+                                    "Thursday" => "77",
+                                    "Friday" => "77",
+                                    "Saturday" => "77",
+                                    "Sunday" => "77",
+                                ),
                             ),
-                            "PaymentTypeOut" => array(array(
-                                "PaymentTypeID" => "77",
-                                "PaymentType" => "77",
-                                "Icon" => "77",
-                                "Enable" => "77",
-                            )),
-                            "ScheduleOut" => array(
-                                "ScheduleID" => "77",
-                                "Monday" => "77",
-                                "Tuesday" => "77",
-                                "Wednesday" => "77",
-                                "Thursday" => "77",
-                                "Friday" => "77",
-                                "Saturday" => "77",
-                                "Sunday" => "77",
-                            ),
-                        ),
-                        "OrderStatus" => "true",
-                    );
+                            "OrderStatus" => "true",
+                        );
+                        header ('Content-Type: application/json');
+                        echo json_encode($data);
+                    */
+                    $getID = $_REQUEST["orderid"];
+                    $sessionk = $_REQUEST["SessionKey"];
+                    $lg = $_REQUEST["lg"];
+                    $conn = getConnection ();
+                    $oData = getOrderData($getID, $conn);
+                   // var_dump($productOrderData);
+                    //array_push($orderData[0]["ProductOrder"], $productOrderData[1] );
+                    if (!empty($oData)) {
+                        $rData = getRestaurantData($oData["RestaurantID"], $conn);
+                    }
                     header ('Content-Type: application/json');
-                    echo json_encode($data);
+                    echo json_encode(array("Order" => $oData, "Restaurant"=> $rData,"OrderStatus" => "true"));
                     break;
             case 'GetUserAddress':
                 
@@ -2091,4 +1918,123 @@ function getIDByToken($sessionk){
                 $stmt = $conn->query ($sqlID);
                 $id = $stmt->fetchAll (PDO::FETCH_ASSOC);
                 return $id[0]["id"];
+}
+
+function getOrderData($getID, $conn){
+    
+                $orderSQL = "SELECT orders.id as OrderID,
+                 orderNum as OrderNum,
+                 idrestaurant as RestaurantID,
+                 idclient as ClientID,
+                 total_price as TotalPriceOrder,
+                 paid as Paid,
+                 orders.created_at as CreationDate,
+                 payment_date as PaymentDate,
+                 payment_type as PaymentType,
+                 base_price as BasePriceOrder,
+                 tax_order as TaxOrder,
+                 tip as Tip,
+                 delivery_address as DeliveryAddressStr,
+                 cupon_id as Cupon,
+                 discount_value as DiscountValue,
+                 base_price_discount as BasePriceOrderAferDiscount,
+                 total_price_discount as TotalPriceOrderComplete,
+                 schedule as Schedule,
+                 order_type as OrderType,
+                 auth_code asReceiptLink,
+                 delivery_fee as DeliveryFee
+                  from orders where orders.id = $getID";
+                /*
+                $sql2 = "select 
+                quality as Quality,
+                value as ProductTotalValue
+                idproduct as Product_ID
+                from order_detail where idorder = $getID";
+                */
+                //$stmt = $conn->query ($sql1);
+                //$data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                 //$conn = getConnection ();
+                /*
+                $orderSQL = "SELECT orders.total_price as TotalValuePreorder, 
+                orders.base_price as BaseValuePreorder,
+                orders.tax_order as TaxValuePreorder,
+                orders.id as PreOrderID from orders WHERE orders.id = $getID";
+                */
+                $stmt = $conn->query ($orderSQL);
+                $orderData = $stmt->fetchAll (PDO::FETCH_ASSOC);
+
+                $productOrderSQL = "SELECT id,
+                 idorder,
+                 idproduct,
+                 quantity as Quantity,
+                 value,
+                 created_at,
+                 updated_at,
+                 (quantity*value) as ProductTotalValue from order_detail where idorder = $getID";
+                $stmt2 = $conn->query ($productOrderSQL);
+                $productOrderData = $stmt2->fetchAll (PDO::FETCH_ASSOC);
+                $orderData[0]["ProductOrder"] = array();
+                $orderData[0]['ReceiptLink']='';
+                $orderData[0]['DeliveryFee']='';
+                foreach ($productOrderData as $key => $value) {
+                    if(isset($value["idproduct"])){
+                        $idProduct = $value["idproduct"];
+                        $productSQL = "SELECT id, idcategoria, name, description, value, 'order', created_at from menu_dishes where menu_dishes.id = $idProduct";
+                        $stmt3 = $conn->query ($productSQL);
+                        $productData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
+                        $productData[0]["ProductPropertyCart"] = array(array(
+                                        "ProductPropertyID" => "2222",
+                                        "ProductID" => "2222",
+                                        "FatherProductPropertyID" => "2222",
+                                        "Name" => "2222",
+                                        "PropertyType" => "2222",
+                                        "GroupingTypeID" => "2222",
+                                        "GroupingType" => "2222",
+                                        "PropertyValueCart" => array(array(
+                                            "PropertyValueID" => "22222",
+                                            "ProductPropertyID" => "22222",
+                                            "ProductID" => "22222",
+                                            "Label" => "22222",
+                                            "Price" => "22222",
+                                            "Cant" => "22222",
+                                            "TotalPrice" => "22222",
+                                        )),
+                                    ));
+                        $productOrderData[$key]["Product"] = array();
+                        $productOrderData[$key]["Product"] = $productData[0];
+                        array_push($orderData[0]["ProductOrder"], $productOrderData[$key] );
+                    }
+                    //var_dump($productOrderData);
+                }
+                return $orderData[0];
+}
+function getRestaurantData($restaurantID, $conn){
+$restaurantData = [];
+                
+                    $restautantIdOrder = $restaurantID;
+                    $restaurantSQL = "SELECT id as RestaurantID,
+                    restaurant_chain as RestaurantChainID,
+                    name as Name,
+                    description as Description,
+                    image as Image,
+                    delivery_area as DeliveryArea,
+                    address as Address,
+                    phone_rest as Phone,
+                    rating as Rate,
+                    citytax as Tax,
+                    longitud as Longitude,
+                    latitud as Latitude,
+                    zipcode as Zip,
+                    distance as Distance,
+                    web as Web,
+                    created_at as CreationDate,
+                    delivery as Delivery,
+                    pickup as Pickup,
+                    YelpID as YelpId
+                    from restaurants where id = $restautantIdOrder
+                    ";
+                    $stmt4 = $conn->query ($restaurantSQL);
+                    $restaurantData = $stmt4->fetchAll (PDO::FETCH_ASSOC);
+                
+                return $restaurantData[0];
 }
