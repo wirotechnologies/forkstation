@@ -243,7 +243,7 @@ $address = $_POST['address'];
                     $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
                     if($stmt){
                         $_SESSION["_token"] = key_random(60);
-                        $conn->query ("update users set remember_token = ".$_SESSION["_token"]." where id=".$data[0]["usuID"]);
+                        $conn->query ("update users set remember_token = '".$_SESSION["_token"]."' where id=".$data[0]["usuID"]);
                     }
                     $sql2 = "select concat_ws(', ', payments_profiles.last_name,  payments_profiles.first_name) As FullName, address AS Address from payments_profiles where payments_profiles.id_profile =".$data[0]["id_profile"]."";    
                     $stmt2 = $conn->query ($sql2);
@@ -511,7 +511,7 @@ $address = $_POST['address'];
                 
                 $SessionKey = $_REQUEST['SessionKey'];
 
-                if($_SESSION["_token"] == $SessionKey){
+                if(isLogin($SessionKey)){
                     $Address = $_REQUEST['Address'];
                     $Suit = $_REQUEST['Suit'];
                     $City = $_REQUEST['City'];
@@ -520,9 +520,9 @@ $address = $_POST['address'];
                     $CrossStreet = $_REQUEST['CrossStreet'];
                     $Phone = $_REQUEST['Phone'];
                     $AddressName = $_REQUEST['AddressName'];
-
+                    $id = getIDByToken($SessionKey);
                     $conn = getConnection ();
-                        $sql = "insert into direcciones_clientes (idUser, type_address, address, apt, zipcode, city, state, cross_street, phone, direcciones_clientes.default) values ($SessionKey, '$AddressName', '$Address', '$Suit', '$ZIPCode', '$City', '$State', '$CrossStreet', '$Phone', 1)";
+                        $sql = "INSERT into direcciones_clientes (iduser, type_address, address, apt, zipcode, city, state, cross_street, phone, direcciones_clientes.default, created_at, updated_at) values ($id, '$AddressName', '$Address', '$Suit', '$ZIPCode', '$City', '$State', '$CrossStreet', '$Phone', 1, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
                         //echo $sql;
                         try {
                             $conn->beginTransaction();
@@ -535,8 +535,8 @@ $address = $_POST['address'];
                         }
                         //$stmt = $conn->query ($sql);
                         //$data1 = $stmt->fetchAll (PDO::FETCH_ASSOC);
-
-                    $data = getAddress($_SESSION["idUser"], $conn);
+                    $data = getAddress($id, $conn);
+                    //$data["Success"] = $sql;
                 }else{
                     $data = array("Success" => "false");
                 }
@@ -1137,7 +1137,7 @@ $address = $_POST['address'];
                 $id = getIDByToken($sessionk);
                 $conn = getConnection();
                 $data = getAddress($id, $conn, 'ClientAddressOut');
-                $data["codeerr"] = "campo: ".$_SESSION["idUser"].$_SESSION["_token"]."++".session_id ();
+                //$data["codeerr"] = "campo: ".$_SESSION["idUser"].$_SESSION["_token"]."++".session_id ();
                 echo json_encode($data);
 
                 
@@ -1547,14 +1547,22 @@ case 'ChangePassword':
     echo json_encode($data);
     break;
 case 'ClientLogOut':
+    //$_SESSION["_token"] = key_random(60);
     session_unset(); 
 
     // destroy the session 
     session_destroy(); 
-    $data = [
-        "Success" => "Success Process",
-        "ErrMessage" => "Message Error",
-    ];
+    $conn = getConnection ();
+    $sessionKey = $_REQUEST["SessionKey"];
+    $logoutSQL ="update users set remember_token = '".key_random(60)."' where id=".getIDByToken($sessionKey);
+    $stmt = $conn->query ($logoutSQL);
+    $data = [];
+    if($stmt){
+        $data["Success"] = "Success Process";
+    }else{
+        $data["ErrMessage"] ="Message Error ";
+    }
+    
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;
@@ -1775,7 +1783,7 @@ case 'PayOrder':
         "ResponseCode" => "14",
         "AuthorizeMessage" => "14",
         "TransactionID" => "14",
-        "ResponseReasonCode" => "14",
+        "ResponseReasonCode" => "14", //1 = exito
     ];
     header ('Content-Type: application/json');
     echo json_encode($data);
@@ -1918,6 +1926,13 @@ function getIDByToken($sessionk){
                 $stmt = $conn->query ($sqlID);
                 $id = $stmt->fetchAll (PDO::FETCH_ASSOC);
                 return $id[0]["id"];
+}
+function isLogin($sessionk){
+    $sqlID = "select remember_token from users where remember_token = '".$sessionk."'";
+                $conn = getConnection ();
+                $stmt = $conn->query ($sqlID);
+                $id = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                return count($id[0]["remember_token"])>0;
 }
 
 function getOrderData($getID, $conn){
