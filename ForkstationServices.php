@@ -1465,7 +1465,7 @@ $address = $_POST['address'];
                 }else if (isset($_REQUEST["OldPassword"])){
                     $OldPassword = $_REQUEST["OldPassword"];
                     $NewPassword = $_REQUEST["NewPassword"];
-                    if(isPassword($conn, $sessionkey, $OldPassword)){
+                    if(isPassword($conn, $sessionkey, $OldPassword) && isset($_REQUEST["NewPassword"])){
                         $ClientProfileSQL = "update users set password = '$NewPassword' where id=$id";
 
                     }
@@ -1834,10 +1834,17 @@ case 'RateRestaurantOrder':
     echo json_encode($data);
     break;
 case 'RemoveClientAddress':
-    $data = [
-        "Success" => "Success Process",
-        "ErrMessage" => "Message Error",
-    ];
+    $sk = $_REQUEST["SessionKey"];
+    $ClientAddressID = $_REQUEST["ClientAddressID"];
+    $conn = getConnection ();
+    $deleteCardSQL = "DELETE from direcciones_clientes where id = $ClientAddressID";
+    $stmt = $conn->query ($deleteCardSQL);
+    if($stmt){
+        $orderData = $stmt->fetchAll (PDO::FETCH_ASSOC); 
+        $data["Success"] = "true";
+    }else{
+        $data["ErrMessage"] = "Message Error";
+    }    
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;
