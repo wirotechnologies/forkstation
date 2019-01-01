@@ -1612,6 +1612,9 @@ $address = $jsonData->address;
         case 'UpdateClientProfile':
             $jsonData = json_decode($obj->Body->UpdateClientProfile->JsonUpdateClientProfile, true);
             $jsonData["op"] = $op;
+            //$jsonData["SessionKey"] = $_REQUEST["SessionKey"];
+            //$jsonData["fullname"] = $_REQUEST["fullname"];
+
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $urlServices);
             curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -1800,7 +1803,7 @@ $address = $jsonData->address;
             echo $dom->saveXML();
             break;
         case 'GetProfileBySessionKey':
-            $jsonData = json_decode($obj->Body->GetProfileBySessionKey->JsonGetProfileBySessionKey, true);
+            $jsonData = json_decode($obj->Body->GetProfileBySessionKey->JsonUserSessionBySessionKey, true);
             $jsonData["op"] = $op;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $urlServices);

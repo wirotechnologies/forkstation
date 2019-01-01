@@ -1143,27 +1143,36 @@ $address = $_POST['address'];
                 
                 break;
             case 'GetProfileBySessionKey':
-                    $data = array(
-                        'User' => array(
-                                "ClientID" => "9",
-                                "UserName" => "9",
-                                "Password" => "9",
-                                "FullName" => "9",
-                                "eMail" => "9",
-                                "FacebookID" => "9",
-                                "TwitterID" => "9",
-                                "Address" => "9",
-                                "Cellphone" => "9",
-                                "CreationDate" => "9",
-                            ),
-                        'Session' => array(
-                            "SessionKey" => "key_s",
-                            "TimeExpiration" => "9",
-                            "ClientID" => "9",
-                        ),
-                    );
-                    header ('Content-Type: application/json');
-                    echo json_encode($data);
+                $sessionkey = $_REQUEST["SessionKey"];
+                $id = getIDByToken($sessionkey);
+                $conn = getConnection ();
+                //$data1 = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                //if($stmt){
+                    $data = getUserByID($conn, $sessionkey);
+                //}
+                /*
+                $data = array(
+                    'User' => array(
+                        "ClientID" => "11",
+                        "UserName" => "11",
+                        "Password" => "11",
+                        "FullName" => "11",
+                        "eMail" => "11",
+                        "FacebookID" => "11",
+                        "TwitterID" => "11",
+                        "Address" => "11",
+                        "Cellphone" => "11",
+                        "CreationDate" => "Cra 25 # 12 - 15",
+                    ),
+                    'Session'=>[
+                        "SessionKey" => "key_s",
+                        "TimeExpiration" => "11",
+                        "ClientID" => "11",
+                    ],
+                );
+                */
+                header ('Content-Type: application/json');
+                echo json_encode($data);
                     break;
             case 'GetOrderForPay':
                 $data = array(
@@ -1387,7 +1396,7 @@ $address = $_POST['address'];
                 break;
             case 'SetNewCard':
                 $data = [];
-                $conn = getConnection ();
+                
                 $sessionk = $_REQUEST["SessionKey"];
                 $cardNumber = $_REQUEST["cardNumber"];
                 $cardCode = $_REQUEST["cardCode"];
@@ -1442,6 +1451,32 @@ $address = $_POST['address'];
                 echo json_encode($data);
                 break; 
             case 'UpdateClientProfile':
+
+                $sessionkey = $_REQUEST["SessionKey"];
+                $id = getIDByToken($sessionkey);
+                $conn = getConnection ();
+                if(isset($_REQUEST["fullname"])){
+                    $fullname = $_REQUEST["fullname"];
+                    $ClientProfileSQL = "update users set username = '$fullname' where id=$id";
+                }else if (isset($_REQUEST["mail"])){
+                    $mail = $_REQUEST["mail"];
+                    $ClientProfileSQL = "update users set email = '$mail' where id=$id";
+
+                }else if (isset($_REQUEST["OldPassword"])){
+                    $OldPassword = $_REQUEST["OldPassword"];
+                    $NewPassword = $_REQUEST["NewPassword"];
+                    if(isPassword($conn, $sessionkey, $OldPassword)){
+                        $ClientProfileSQL = "update users set password = '$NewPassword' where id=$id";
+
+                    }
+                    //echo "bien";
+                }
+                $stmt = $conn->query ($ClientProfileSQL);
+                //$data1 = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                //if($stmt){
+                    $data = getUserByID($conn, $sessionkey);
+                //}
+                /*
                 $data = array(
                     'User' => array(
                         "ClientID" => "11",
@@ -1461,6 +1496,7 @@ $address = $_POST['address'];
                         "ClientID" => "11",
                     ],
                 );
+                */
                 header ('Content-Type: application/json');
                 echo json_encode($data);
                 break; 
@@ -2052,4 +2088,45 @@ $restaurantData = [];
                     $restaurantData = $stmt4->fetchAll (PDO::FETCH_ASSOC);
                 
                 return $restaurantData[0];
+}
+function getUserByID($conn, $token){
+    $sql = "select id as usuID, users.UserID AS ClientID, users.username AS UserName, users.username AS FullName, users.password AS Password, users.email AS eMail, users.phone AS Cellphone, users.created_at As CreationDate,  users.id_profile from users where users.remember_token='$token'";
+                    $stmt = $conn->query ($sql);
+                    $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                    
+                    //$sql2 = "select concat_ws(', ', payments_profiles.last_name,  payments_profiles.first_name) As FullName, address AS Address from payments_profiles where payments_profiles.id_profile =".$data[0]["id_profile"]."";    
+                    $sql2 = "select address AS Address from payments_profiles where payments_profiles.id_profile =".$data[0]["id_profile"]."";    
+                    $stmt2 = $conn->query ($sql2);
+                    $data2 = $stmt2->fetchAll (PDO::FETCH_ASSOC);
+                    //echo json_encode(!isset($data2));
+                    $paymentData = array(
+                        "FullName" => "",
+                        "FacebookID" => "",
+                        "TwitterID" => "",
+                        "Address" => "",
+                    );
+                    if(isset($data2)){
+                        foreach ($data2[0] as $key => $value) {
+                            $data[0][$key] = $value;
+                        }
+                    }
+                    try {                                          
+
+                    $sessionR = array(
+                        "SessionKey"=>$token,
+                        "TimeExpiration"=>"15",
+                        "ClientID"=>$data[0]["usuID"],
+                    );
+                    } catch (Exception $e) {
+                        echo $e->getMessage();
+                    }
+                    //array_push($data[0], $paymentData);
+                    $response = array("User" => $data[0], "Session" => $sessionR);
+                    return $response;
+}
+function isPassword($conn, $token, $password){
+    $sql = "select id as usuID, users.password AS Password from users where users.remember_token='$token'";
+                    $stmt = $conn->query ($sql);
+                    $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                    return $data[0]["Password"] == $password;
 }
