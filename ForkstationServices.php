@@ -522,7 +522,7 @@ $address = $_POST['address'];
                     $AddressName = $_REQUEST['AddressName'];
                     $id = getIDByToken($SessionKey);
                     $conn = getConnection ();
-                        $sql = "INSERT into direcciones_clientes (iduser, type_address, address, apt, zipcode, city, state, cross_street, phone, direcciones_clientes.default, created_at, updated_at) values ($id, '$AddressName', '$Address', '$Suit', '$ZIPCode', '$City', '$State', '$CrossStreet', '$Phone', 1, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
+                        $sql = "INSERT into direcciones_clientes (iduser, type_address, address, apt, zipcode, city, state, cross_street, phone, direcciones_clientes.default, created_at, updated_at) values ($id, '$AddressName', '$Address', '$Suit', '$ZIPCode', '$City', '$State', '$CrossStreet', '$Phone', 0, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
                         //echo $sql;
                         try {
                             $conn->beginTransaction();
@@ -1979,10 +1979,16 @@ case 'RemoveClientAddress':
     echo json_encode($data);
     break;
 case 'SetDefaultClientAddress':
-    $data = [
-        "Success" => "Success Process",
-        "ErrMessage" => "Message Error",
-    ];
+    $sk = $_REQUEST["SessionKey"];
+    $clientaddressid = $_REQUEST["ClientAddressID"];
+    $conn = getConnection ();    
+    $setDefaultSQL = "UPDATE direcciones_clientes SET direcciones_clientes.default = 1 WHERE id = $clientaddressid";
+    $stmt = $conn->query ($setDefaultSQL);
+    if($stmt){
+        $data["Success"] = "true";
+    }else{
+        $data["ErrMessage"] = "Message Error";
+    }    
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;
