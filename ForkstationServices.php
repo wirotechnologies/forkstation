@@ -1517,18 +1517,45 @@ $address = $_POST['address'];
                 echo json_encode($data);
                 break;
             case 'NewContact':
-                $data = [
-                    "Success" => "true",
-                    "ErrMessage" => "Message Error",
-                ];
+                $mail = $_REQUEST["eMail"];
+                $to = "crhis_316360@hotmail.com";
+                $subject = "Your password";
+                $message = "Hello Homer, thanks for registering. Your password is: springfield";
+                $from = "crhisdlm94@gmail.com";
+                $headers = "From: $from";
+
+                // Send email
+                $status = mail($to,$subject,$message,$headers);
+                $eval =  $status ? "true" : "false";
+                $data = [];
+                if($status){
+                    $data["Success"] = "true";
+                }else{
+                    $data["ErrMessage"] = "Message Error";
+                }
+
                 header ('Content-Type: application/json');
                 echo json_encode($data);
                 break;
             case 'NewPwdChange':
-                $data = [
-                    "Success" => "true",
-                    "ErrMessage" => "Message Error",
-                ];
+                $mail = $_REQUEST["mail"];
+                $data = [];
+                if(!empty($mail)){
+                    $newPassword = randomPassword();
+                    $data["ls"] = $newPassword;
+                    sendMailRP($mail, "Reset Password", $newPassword);
+                    $newPassword = sha1($newPassword);
+                    $conn = getConnection ();
+                    $newPwdSQL = "update users set password = '$newPassword' where email='$mail'";
+                    $stmt = $conn->query ($newPwdSQL);
+                    if($stmt){
+                        $data["Success"] = "true";                        
+                    }else{
+                        $data["ErrMessage"] = "Not changed Password in DB";                                            
+                    }
+                }else{
+                    $data["ErrMessage"] = "Empty Email";                    
+                }
                 header ('Content-Type: application/json');
                 echo json_encode($data);
 
@@ -1539,7 +1566,7 @@ $address = $_POST['address'];
                 $fullname = $_REQUEST["fullname"];
                 $conn = getConnection ();
                 if(!empty($email)) {
-                    $sql = "insert into users (email, password, username, UserID) values ('$email', '$pass', '$fullname', 1)";
+                    $sql = "insert into users (email, password, username, UserID, created_at, updated_at) values ('$email', '$pass', '$fullname', 1, '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
                     try {
                         $conn->beginTransaction();
                         $conn->exec($sql);
@@ -1575,6 +1602,7 @@ $address = $_POST['address'];
                     echo json_encode($data);
                 break;
 case 'ChangePassword':
+    $
     $data = [
         "Success" => "Success Process",
         "ErrMessage" => "Message Error",
@@ -1802,10 +1830,19 @@ case 'DuplicateOrder2':
     echo json_encode($data);
     break;
 case 'NewProductComment':
-    $data = [
-        "Success" => "Success Process",
-        "ErrMessage" => "Message Error",
-    ];
+    $sessionkey = $_REQUEST["SessionKey"];
+    $productid = $_REQUEST["ProductID"];
+    $comment = $_REQUEST["Comment"];
+    $idUser = getIDByToken($sessionkey);
+    $nPCommentSQL = "insert into comments_dishes (id_user, id_dishes, comment, created_at, updated_at) values ($idUser, $productid, '$comment', '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
+    $conn = getConnection();
+    $stmt = $conn->query ($nPCommentSQL);
+    $data = [];
+    if($stmt){
+        $data["Success"] = "true";
+    }else{
+        $data["ErrMessage"] = "Message Error";
+    }  
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;
@@ -2136,4 +2173,49 @@ function isPassword($conn, $token, $password){
                     $stmt = $conn->query ($sql);
                     $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
                     return $data[0]["Password"] == $password;
+}
+
+function sendMailRP($to, $subject, $newPass){
+//    $to = "somebody@example.com, somebodyelse@example.com";
+$from = "webmaster@example.com";
+$message = "
+<html>
+<head>
+<title>Reset Password</title>
+</head>
+<body>
+<p>Reset Password</p>
+<table>
+<tr>
+<th>Email</th>
+<th>Password</th>
+</tr>
+<tr>
+<td>".$to."</td>
+<td>".$newPass."</td>
+</tr>
+</table>
+</body>
+</html>
+";
+
+// Always set content-type when sending HTML email
+$headers = "MIME-Version: 1.0" . "\r\n";
+$headers .= "Content-type:text/html;charset=UTF-8" . "\r\n";
+
+// More headers
+$headers .= 'From: <'.$from.'>' . "\r\n";
+//$headers .= 'Cc: myboss@example.com' . "\r\n";
+
+mail($to,$subject,$message,$headers);
+}
+function randomPassword() {
+    $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+    $pass = array(); //remember to declare $pass as an array
+    $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+    for ($i = 0; $i < 8; $i++) {
+        $n = rand(0, $alphaLength);
+        $pass[] = $alphabet[$n];
+    }
+    return implode($pass); //turn the array into a string
 }

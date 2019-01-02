@@ -1296,7 +1296,27 @@ $address = $jsonData->address;
             echo $dom->saveXML();
             break; 
         case 'ChangePassword':
-
+            $jsonData = json_decode($obj->Body->ChangePassword->JsonChangePassword, true);
+            $jsonData["op"] = $op;
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $urlServices);
+            curl_setopt($ch, CURLOPT_HEADER, 0);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                $jsonData
+            )); 
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $result = curl_exec($ch);
+            $data = $result;
+                //echo $data;
+            $data = json_decode($data, true);
+                //var_dump($data);
+            $dom = new DOMDocument();
+            $mainElement =  $dom->createElement('ChangePassword');
+            $mainElement = getXMLChildrens($dom, $data, $mainElement);
+            $dom->appendChild($mainElement);
+            Header('Content-type: text/xml');
+            echo $dom->saveXML();
             break;
         case 'ClientLogOut':
             $jsonData = json_decode($obj->Body->ClientLogOut->JsonLogOut, true);
