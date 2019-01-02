@@ -558,7 +558,7 @@ $address = $_POST['address'];
                 $id = $stmt->fetchAll (PDO::FETCH_ASSOC);
                
                 $idOrderNew = $id[0]["id"] + 1;
-                $typeOrder = ['delivery' => 2];
+                $typeOrder = ['delivery' => 2, 'pickup' => 1];
 
                 $total = 0;
                 foreach ($items as $value) {
@@ -1647,187 +1647,257 @@ case 'DeleteCard':
     echo json_encode($data);
     break;
 case 'DuplicateOrder2':
-    $data = [
-        "Success" => "true",
-        "Order" => [
-            "OrderID" => "13",
-            "OrderNum" => "13",
-            "RestaurantID" => "13",
-            "ClientID" => "13",
-            "TotalPriceOrder" => "13",
-            "Paid" => "13",
-            "CreationDate" => "13",
-            "PaymentDate" => "13",
-            "PaymentType" => "13",
-            "BasePriceOrder" => "13",
-            "TaxOrder" => "13",
-            "Tip" => "13",
-            "DeliveryAddressStr" => "13",
-            "Cupon" => "13",
-            "DiscountValue" => "13",
-            "BasePriceOrderAferDiscount" => "13",
-            "TotalPriceOrderComplete" => "13",
-            "Schedule" => "13",
-            "OrderType" => "13",
-            "ProductOrder" => [[
-                "Quantity" => "1313",
-                "ProductTotalValue" => "1313",
-                "Product" => [
-                    "ProductID" => "131313",
-                    "Name" => "131313",
-                    "Description" => "131313",
-                    "ProductImg" => "131313",
-                    "Enable" => "131313",
-                    "CategoryID" => "131313",
-                    "Category" => "131313",
-                    "CreationDate" => "131313",
-                    "ProductOrder" => "131313",
-                    "CategoryOrder" => "131313",
-                    "Value" => "131313",
-                    "TotalValue" => "131313",
-                    "ProductPropertyCart" => [[
-                        "ProductPropertyID" => "13131313",
-                        "ProductID" => "13131313",
-                        "FatherProductPropertyID" => "13131313",
-                        "Name" => "13131313",
-                        "PropertyType" => "13131313",
-                        "GroupingTypeID" => "13131313",
-                        "GroupingType" => "13131313",
-                        "PropertyValueCart" => [[
-                            "PropertyValueID" => "1313131313",
-                            "ProductPropertyID" => "1313131313",
-                            "ProductID" => "1313131313",
-                            "Label" => "1313131313",
-                            "Price" => "1313131313",
-                            "Cant" => "1313131313",
-                            "TotalPrice" => "1313131313",
-                        ]],
-                    ]],
-                ],
-                "Instructions" => "1313",
-            ]],
-            "ReceiptLink" => "13",
-            "DeliveryFee" => "13",
-        ],
-        "Restaurant" => [
-            "RestaurantID" => "13",
-            "RestaurantChainID" => "13",
-            "Name" => "13",
-            "Description" => "13",
-            "Image" => "13",
-            "Tips" => "13",
-            "DeliveryArea" => "13",
-            "DeliveryTime" => "13",
-            "OurKitchen" => "13",
-            "Address" => "13",
-            "Phones" => "13",
-            "Rate" => "13",
-            "MinimumOrder" => "13",
-            "Tax" => "13",
-            "DeliveryCost" => "13",
-            "Longitude" => "13",
-            "Latitude" => "13",
-            "Zip" => "13",
-            "Distance" => "13",
-            "Web" => "13",
-            "CreationDate" => "13",
-            "Delivery" => "13",
-            "Pickup" => "13",
-            "Enable" => "13",
-            "YelpID" => "13",
-            "Dividends_percent" => "13",
-            "ListFavoriteDisch" => [
-                "ProductMenuOut" => [[
-                    "ProductID" => "1313",
-                    "Name" => "1313",
-                    "Description" => "1313",
-                    "Value" => "1313",
-                    "ProductImg" => "1313",
-                    "Enable" => "1313",
-                    "CategoryID" => "1313",
-                    "Category" => "1313",
-                    "CreationDate" => "1313",
-                    "ProductOrder" => "1313",
-                    "CategoryOrder" => "1313",
-                    "MenuID" => "1313",
-                    "ProductPropertyOut" => [[
-                        "ProductPropertyID" => "131313",
+    $sessionkey = $_REQUEST["SessionKey"];
+    $orderid = $_REQUEST["orderid"];
+    /*
+        $data = [
+            "Success" => "true",
+            "Order" => [
+                "OrderID" => "13",
+                "OrderNum" => "13",
+                "RestaurantID" => "13",
+                "ClientID" => "13",
+                "TotalPriceOrder" => "13",
+                "Paid" => "13",
+                "CreationDate" => "13",
+                "PaymentDate" => "13",
+                "PaymentType" => "13",
+                "BasePriceOrder" => "13",
+                "TaxOrder" => "13",
+                "Tip" => "13",
+                "DeliveryAddressStr" => "13",
+                "Cupon" => "13",
+                "DiscountValue" => "13",
+                "BasePriceOrderAferDiscount" => "13",
+                "TotalPriceOrderComplete" => "13",
+                "Schedule" => "13",
+                "OrderType" => "13",
+                "ProductOrder" => [[
+                    "Quantity" => "1313",
+                    "ProductTotalValue" => "1313",
+                    "Product" => [
                         "ProductID" => "131313",
-                        "FatherProductPropertyID" => "131313",
                         "Name" => "131313",
-                        "PropertyType" => "131313",
-                        "GroupingTypeID" => "131313",
-                        "GroupingType" => "131313",
-                        "PropertyValueOut" => [[
-                            "PropertyValueID" => "13131313",
+                        "Description" => "131313",
+                        "ProductImg" => "131313",
+                        "Enable" => "131313",
+                        "CategoryID" => "131313",
+                        "Category" => "131313",
+                        "CreationDate" => "131313",
+                        "ProductOrder" => "131313",
+                        "CategoryOrder" => "131313",
+                        "Value" => "131313",
+                        "TotalValue" => "131313",
+                        "ProductPropertyCart" => [[
                             "ProductPropertyID" => "13131313",
                             "ProductID" => "13131313",
-                            "Label" => "13131313",
-                            "Price" => "13131313",
+                            "FatherProductPropertyID" => "13131313",
+                            "Name" => "13131313",
+                            "PropertyType" => "13131313",
+                            "GroupingTypeID" => "13131313",
+                            "GroupingType" => "13131313",
+                            "PropertyValueCart" => [[
+                                "PropertyValueID" => "1313131313",
+                                "ProductPropertyID" => "1313131313",
+                                "ProductID" => "1313131313",
+                                "Label" => "1313131313",
+                                "Price" => "1313131313",
+                                "Cant" => "1313131313",
+                                "TotalPrice" => "1313131313",
+                            ]],
                         ]],
-                    ]],
+                    ],
+                    "Instructions" => "1313",
                 ]],
+                "ReceiptLink" => "13",
+                "DeliveryFee" => "13",
             ],
-            "ListCoupons" => [
-                "ProductMenuOut" => [
-                    "ProductID" => "1313",
-                    "Name" => "1313",
-                    "Description" => "1313",
-                    "Value" => "1313",
-                    "ProductImg" => "1313",
-                    "Enable" => "1313",
-                    "CategoryID" => "1313",
-                    "Category" => "1313",
-                    "CreationDate" => "1313",
-                    "ProductOrder" => "1313",
-                    "CategoryOrder" => "1313",
-                    "MenuID" => "1313",
-                    "ProductPropertyOut" => [[
-                        "ProductPropertyID" => "131313",
-                        "ProductID" => "131313",
-                        "FatherProductPropertyID" => "131313",
-                        "Name" => "131313",
-                        "PropertyType" => "131313",
-                        "GroupingTypeID" => "131313",
-                        "GroupingType" => "131313",
-                        "PropertyValueOut" => [[
-                            "PropertyValueID" => "13131313",
-                            "ProductPropertyID" => "13131313",
-                            "ProductID" => "13131313",
-                            "Label" => "13131313",
-                            "Price" => "13131313",
-                        ]],
-                    ]],
-                ],
-            ],
-            "Filters" => [
+            "Restaurant" => [
+                "RestaurantID" => "13",
+                "RestaurantChainID" => "13",
+                "Name" => "13",
+                "Description" => "13",
+                "Image" => "13",
+                "Tips" => "13",
+                "DeliveryArea" => "13",
+                "DeliveryTime" => "13",
+                "OurKitchen" => "13",
+                "Address" => "13",
+                "Phones" => "13",
+                "Rate" => "13",
+                "MinimumOrder" => "13",
+                "Tax" => "13",
+                "DeliveryCost" => "13",
+                "Longitude" => "13",
+                "Latitude" => "13",
+                "Zip" => "13",
+                "Distance" => "13",
+                "Web" => "13",
+                "CreationDate" => "13",
                 "Delivery" => "13",
                 "Pickup" => "13",
-                "FreeDelivery" => "13",
-                "OpenNow" => "13",
-                "HaveCoupons" => "13",
-            ],
-            "PaymentTypeOut" => [[
-                "PaymentTypeID" => "13",
-                "PaymentType" => "13",
-                "Icon" => "13",
                 "Enable" => "13",
-            ]],
-            "ScheduleOut" => [
-                "ScheduleID" => "13",
-                "Monday" => "13",
-                "Tuesday" => "13",
-                "Wednesday" => "13",
-                "Thursday" => "13",
-                "Friday" => "13",
-                "Saturday" => "13",
-                "Sunday" => "13",
+                "YelpID" => "13",
+                "Dividends_percent" => "13",
+                "ListFavoriteDisch" => [
+                    "ProductMenuOut" => [[
+                        "ProductID" => "1313",
+                        "Name" => "1313",
+                        "Description" => "1313",
+                        "Value" => "1313",
+                        "ProductImg" => "1313",
+                        "Enable" => "1313",
+                        "CategoryID" => "1313",
+                        "Category" => "1313",
+                        "CreationDate" => "1313",
+                        "ProductOrder" => "1313",
+                        "CategoryOrder" => "1313",
+                        "MenuID" => "1313",
+                        "ProductPropertyOut" => [[
+                            "ProductPropertyID" => "131313",
+                            "ProductID" => "131313",
+                            "FatherProductPropertyID" => "131313",
+                            "Name" => "131313",
+                            "PropertyType" => "131313",
+                            "GroupingTypeID" => "131313",
+                            "GroupingType" => "131313",
+                            "PropertyValueOut" => [[
+                                "PropertyValueID" => "13131313",
+                                "ProductPropertyID" => "13131313",
+                                "ProductID" => "13131313",
+                                "Label" => "13131313",
+                                "Price" => "13131313",
+                            ]],
+                        ]],
+                    ]],
+                ],
+                "ListCoupons" => [
+                    "ProductMenuOut" => [
+                        "ProductID" => "1313",
+                        "Name" => "1313",
+                        "Description" => "1313",
+                        "Value" => "1313",
+                        "ProductImg" => "1313",
+                        "Enable" => "1313",
+                        "CategoryID" => "1313",
+                        "Category" => "1313",
+                        "CreationDate" => "1313",
+                        "ProductOrder" => "1313",
+                        "CategoryOrder" => "1313",
+                        "MenuID" => "1313",
+                        "ProductPropertyOut" => [[
+                            "ProductPropertyID" => "131313",
+                            "ProductID" => "131313",
+                            "FatherProductPropertyID" => "131313",
+                            "Name" => "131313",
+                            "PropertyType" => "131313",
+                            "GroupingTypeID" => "131313",
+                            "GroupingType" => "131313",
+                            "PropertyValueOut" => [[
+                                "PropertyValueID" => "13131313",
+                                "ProductPropertyID" => "13131313",
+                                "ProductID" => "13131313",
+                                "Label" => "13131313",
+                                "Price" => "13131313",
+                            ]],
+                        ]],
+                    ],
+                ],
+                "Filters" => [
+                    "Delivery" => "13",
+                    "Pickup" => "13",
+                    "FreeDelivery" => "13",
+                    "OpenNow" => "13",
+                    "HaveCoupons" => "13",
+                ],
+                "PaymentTypeOut" => [[
+                    "PaymentTypeID" => "13",
+                    "PaymentType" => "13",
+                    "Icon" => "13",
+                    "Enable" => "13",
+                ]],
+                "ScheduleOut" => [
+                    "ScheduleID" => "13",
+                    "Monday" => "13",
+                    "Tuesday" => "13",
+                    "Wednesday" => "13",
+                    "Thursday" => "13",
+                    "Friday" => "13",
+                    "Saturday" => "13",
+                    "Sunday" => "13",
+                ],
             ],
-        ],
-        "ErrMessage" => "",
-    ];
+            "ErrMessage" => "",
+        ];
+    */
+    $conn = getConnection ();
+    $orderOriginSQL = "select * from orders where id=$orderid";
+    $originOrder = $conn->query ($orderOriginSQL);
+    $dataOriginOrder = $originOrder->fetchAll (PDO::FETCH_ASSOC)[0];
+    $dataOriginOrder["orderNum"] = date('Ymdhms') + rand(1,999);
+    $dataOriginOrder["created_at"] = date('Y-m-d H:i:s');
+    $dataOriginOrder["updated_at"] = date('Y-m-d H:i:s');
+    
+
+    $clientId = getIDByToken($sessionkey);
+    $sqlID = "select max(id) as id from orders";
+    $stmt = $conn->query ($sqlID);
+    $id = $stmt->fetchAll (PDO::FETCH_ASSOC);
+    $idOrderNew = $id[0]["id"] + 1;
+    $dataOriginOrder["id"] = $idOrderNew;
+
+    
+    $valuesO = array_values($dataOriginOrder);
+    foreach ($valuesO as $key => $value) {
+        if(empty($value)){
+            $valuesO[$key] = "NULL";
+        }else{
+            $valuesO[$key] = "'".$value."'";            
+        }
+    }
+
+    $fields = "(".(implode(", ",array_keys($dataOriginOrder))). ")";
+    $values = "(".(implode(", ",array_values($valuesO))). ")";
+    
+
+    $orderDOriginSQL = "select * from order_detail where idorder=$orderid";
+    $originOrder = $conn->query ($orderDOriginSQL);
+    $dataDOriginOrder = $originOrder->fetchAll (PDO::FETCH_ASSOC);
+
+    if($dataDOriginOrder){        
+        $sql1 = "INSERT into orders ".$fields." values ".$values;
+        try {
+            $conn->beginTransaction();
+            $conn->exec($sql1);
+            $conn->commit();
+            //echo $sql;
+        } catch (Exception $e) {
+          $conn->rollBack();
+          //echo "Failed: " . $e->getMessage();
+        }
+        foreach ($dataDOriginOrder as $value) {
+            $sql2 = "INSERT into order_detail (idorder, type, idproduct, quantity, value, created_at, updated_at) values ($idOrderNew, ".$value["type"].", ".$value["idproduct"].", ".$value["quantity"].", ".$value["value"].", '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
+                //$id = $stmt->fetchAll (PDO::FETCH_ASSOC);
+            try {
+                $conn->beginTransaction();
+                $conn->exec($sql2);
+                $conn->commit();
+                //echo $sql;
+            } catch (Exception $e) {
+              $conn->rollBack();
+              //echo "Failed: " . $e->getMessage();
+            }
+        }
+    }
+    //$conn = getConnection ();
+    $oData = getOrderData($idOrderNew, $conn);
+   // var_dump($productOrderData);
+    //array_push($orderData[0]["ProductOrder"], $productOrderData[1] );
+    if (!empty($oData)) {
+        $rData = getRestaurantData($oData["RestaurantID"], $conn);
+    }
     header ('Content-Type: application/json');
-    echo json_encode($data);
+    echo json_encode(array("Order" => $oData, "Restaurant"=> $rData));
     break;
 case 'NewProductComment':
     $sessionkey = $_REQUEST["SessionKey"];
@@ -1863,10 +1933,33 @@ case 'PayOrder':
     break;
 
 case 'RateRestaurantOrder':
-    $data = [
-        "Success" => "Success Process",
-        "ErrMessage" => "Message Error",
-    ];
+    $sessionkey = $_REQUEST["SessionKey"];
+    $orderid = $_REQUEST["orderid"];
+    $rate = $_REQUEST["rate"];
+    $time = $_REQUEST["time"];
+    $description = $_REQUEST["description"];
+    $values = "";
+    if (!empty($_REQUEST["rate"])) {
+        $values .= "rate_order = $rate";
+    }if (!empty($_REQUEST["time"])) {
+        if(!empty($values)) {$values.= ", ";}
+        $values .= "duration_delivery = '$time'";
+
+    }if (!empty($_REQUEST["description"])) {
+        if(!empty($values)) {$values.= ", ";}
+        $values .= ", comment_rate = '$description'";
+    }
+    $id = getIDByToken($sessionkey);
+    $rateSQL = "UPDATE orders SET ".$values." WHERE id = $orderid";
+    $conn = getConnection ();
+    $stmt = $conn->query ($rateSQL);
+    $data = [];
+    if ($stmt) {
+        $data["Success"] = "Success Process";
+    }else{
+        $data["ErrMessage"] = "Message Error ".$rateSQL;
+    }
+
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;

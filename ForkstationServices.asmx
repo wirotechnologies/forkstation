@@ -1395,6 +1395,8 @@ $address = $jsonData->address;
         case 'DuplicateOrder2':
             $jsonData = json_decode($obj->Body->DuplicateOrder2->JsonDuplicateOrder2, true);
             $jsonData["op"] = $op;
+            $jsonData["SessionKey"] = $_REQUEST["SessionKey"];;
+            $jsonData["orderid"] = $_REQUEST["orderid"];;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $urlServices);
             curl_setopt($ch, CURLOPT_HEADER, 0);
