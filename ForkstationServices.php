@@ -2075,7 +2075,7 @@ function getAddress($SessionKey, $conn, $sd = 'ClientAddress'){
                 $colums .= "zipcode As ZIPCode, ";
                 $colums .= "cross_street As CrossStreet, ";
                 $colums .= "phone As Phone, ";
-                $colums .= "id As AddressName, ";
+                $colums .= "address As AddressName, ";
                 $colums .= "created_at As CreationDate, ";
                 $colums .= "direcciones_clientes.default As 'Default', ";
                 $colums .= "id As 'Enable'"; //pendiente
@@ -2111,7 +2111,7 @@ function getAddressID($id, $conn){
                 $colums .= "zipcode As ZIPCode, ";
                 $colums .= "cross_street As CrossStreet, ";
                 $colums .= "phone As Phone, ";
-                $colums .= "id As AddressName, ";
+                $colums .= "address As AddressName, ";
                 $colums .= "created_at As CreationDate, ";
                 $colums .= "direcciones_clientes.default As 'Default', ";
                 $colums .= "id As 'Enable'"; //pendiente
