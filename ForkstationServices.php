@@ -1432,21 +1432,37 @@ $address = $_POST['address'];
                 echo json_encode($data);
                 break; 
             case 'UpdateClientAddress':
+                $sessionkey = $_REQUEST["SessionKey"];
+                $clientaddressid = $_REQUEST["ClientAddressID"];
+                $address = $_REQUEST["Address"];
+                $suit = $_REQUEST["Suit"];
+                $city = $_REQUEST["City"];
+                $state = $_REQUEST["State"];
+                $zipcode = $_REQUEST["ZIPCode"];
+                $crossstreet = $_REQUEST["CrossStreet"];
+                $phone = $_REQUEST["Phone"];
+                $addressname = $_REQUEST["AddressName"];
+                $conn = getConnection ();
+                $uClientAddressSQL = "UPDATE direcciones_clientes SET type_address = '$address', apt = '$suit', city = '$city', state = '$state', zipcode = '$zipcode', cross_street = '$crossstreet', phone = '$phone', updated_at = '".date('Y-m-d H:i:s')."' WHERE id=$clientaddressid";
+                $stmt = $conn->query ($uClientAddressSQL);
                 $data = array(
-                    "ClientAddressID" => "12",
-                    "ClientID" => "12",
-                    "Address" => "12",
-                    "Suit" => "12",
-                    "City" => "12",
-                    "State" => "12",
-                    "ZIPCode" => "12",
-                    "CrossStreet" => "12",
-                    "Phone" => "12",
-                    "AddressName" => "12",
-                    "CreationDate" => "12",
-                    "Default" => "12",
-                    "Enable" => "12",
+                    "ClientAddressID" => "",
+                    "ClientID" => "",
+                    "Address" =>"",
+                    "Suit" => "",
+                    "City" => "",
+                    "State" => "",
+                    "ZIPCode" => "",
+                    "CrossStreet" => "",
+                    "Phone" => "",
+                    "AddressName" => "",
+                    "CreationDate" => "",
+                    "Default" => "",
+                    "Enable" => "",
                 );
+                if ($stmt) {
+                    $data = getAddressID($clientaddressid, $conn);
+                }
                 header ('Content-Type: application/json');
                 echo json_encode($data);
                 break; 
@@ -2073,6 +2089,39 @@ function getAddress($SessionKey, $conn, $sd = 'ClientAddress'){
                             'Success' => 'true',
                             $sd => $result,
                         );
+                    }else{
+                        $data=["errorResponse"=>"query error DB"] ;                            
+                    }
+
+                    header ('Content-Type: application/json');
+                    
+                } catch (Exception $e) {
+                        $data=["errorResponse"=>"query error DB"] ;                            
+                    header ('Content-Type: application/json');
+                }
+                return ($data);
+}
+function getAddressID($id, $conn){
+    $colums = "id As ClientAddressID, ";
+                $colums .= "idUser As ClientID, ";
+                $colums .= "type_address As Address, ";
+                $colums .= "apt As Suit, ";
+                $colums .= "city As City, ";
+                $colums .= "state As State, ";
+                $colums .= "zipcode As ZIPCode, ";
+                $colums .= "cross_street As CrossStreet, ";
+                $colums .= "phone As Phone, ";
+                $colums .= "id As AddressName, ";
+                $colums .= "created_at As CreationDate, ";
+                $colums .= "direcciones_clientes.default As 'Default', ";
+                $colums .= "id As 'Enable'"; //pendiente
+                //echo $sql;
+                try {
+                    $sql = "select ".$colums." from direcciones_clientes where id=".$id."";
+                    $stmt = $conn->query($sql);
+                    if($stmt){
+                        $result = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                        $data = $result[0];
                     }else{
                         $data=["errorResponse"=>"query error DB"] ;                            
                     }

@@ -1558,8 +1558,6 @@ $address = $jsonData->address;
         case 'SetDefaultClientAddress':
             $jsonData = json_decode($obj->Body->SetDefaultClientAddress->JsonSetDefaultClientAddress, true);
             $jsonData["op"] = $op;
-            $jsonData["SessionKey"] = $_REQUEST["SessionKey"];;
-            $jsonData["ClientAddressID"] = $_REQUEST["ClientAddressID"];;
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $urlServices);
@@ -1610,7 +1608,7 @@ $address = $jsonData->address;
 
             break; 
         case 'UpdateClientAddress':
-            $jsonData = json_decode($obj->Body->UpdateClientAddress->JsonUpdateClientAddress, true);
+            $jsonData = json_decode($obj->Body->UpdateClientAddress->JsonUpdateAddressClient, true);
             $jsonData["op"] = $op;
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $urlServices);
