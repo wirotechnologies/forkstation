@@ -1826,6 +1826,7 @@ $address = $jsonData->address;
         case 'GetProfileBySessionKey':
             $jsonData = json_decode($obj->Body->GetProfileBySessionKey->JsonUserSessionBySessionKey, true);
             $jsonData["op"] = $op;
+
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $urlServices);
             curl_setopt($ch, CURLOPT_HEADER, 0);

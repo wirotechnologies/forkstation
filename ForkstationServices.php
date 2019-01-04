@@ -2072,9 +2072,25 @@ case 'GetDefaultUserAddress':
     echo json_encode($data);
     break;
 case 'GetProductComments':
+    $sessionkey = $_REQUEST["SessionKey"];
+    $productid = $_REQUEST["ProductID"];
+
+    $id = getIDByToken($sessionkey);
+
+    $commentProductSQL = "SELECT 
+        comments_dishes.id as ProductCommentID,
+        comments_dishes.id_dishes as ProductID,
+        comments_dishes.id_user as ClientID,
+        comments_dishes.comment as Comment,
+        comments_dishes.created_at as CreationDate,
+        users.username as FullName 
+        from comments_dishes, users WHERE users.id = comments_dishes.id_user and comments_dishes.id_dishes = $productid";
+
+    $conn = getConnection();
+    $stmt = $conn->query($commentProductSQL);
+/*
     $data = [
-        "BannerOut" => [
-            "ProductCommentOut" => [[
+        "BannerOut" => [ "ProductCommentOut" => [[
                 "ProductCommentID" => "16",
                 "ProductID" => "16",
                 "ClientID" => "16",
@@ -2084,7 +2100,15 @@ case 'GetProductComments':
                 "FullName" => "16",
             ]],
         ],
-    ];
+    ];*/
+    $data = [
+        "BannerOut" => [ "ProductCommentOut" =>[]]];
+    if ($stmt) {
+        $result = $stmt->fetchAll (PDO::FETCH_ASSOC);
+        foreach ($result as $value) {
+            array_push($data["BannerOut"]["ProductCommentOut"], $value);
+        }
+    }
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;
