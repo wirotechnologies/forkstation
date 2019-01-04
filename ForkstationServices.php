@@ -243,7 +243,7 @@ $address = $_POST['address'];
                     $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
                     if($stmt){
                         $_SESSION["_token"] = key_random(60);
-                        $conn->query ("update users set remember_token = '".$_SESSION["_token"]."' where id=".$data[0]["usuID"]);
+                        $conn->query ("update users set remember_token = '".$_SESSION["_token"]."', updated_at = '".date('Y-m-d H:i:s')."' where id=".$data[0]["usuID"]);
                     }
                     $sql2 = "select concat_ws(', ', payments_profiles.last_name,  payments_profiles.first_name) As FullName, address AS Address from payments_profiles where payments_profiles.id_profile =".$data[0]["id_profile"]."";    
                     $stmt2 = $conn->query ($sql2);
@@ -285,7 +285,7 @@ $address = $_POST['address'];
                     $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
                     if($stmt){
                         $_SESSION["_token"] = key_random(60);
-                        $conn->query ("update users set remember_token = '".$_SESSION["_token"]."' where id=".$data[0]["usuID"]);
+                        $conn->query ("update users set remember_token = '".$_SESSION["_token"]."', updated_at = '".date('Y-m-d H:i:s')."' where id=".$data[0]["usuID"]);
                     }
                     $sql2 = "select concat_ws(', ', payments_profiles.last_name,  payments_profiles.first_name) As FullName, address AS Address from payments_profiles where payments_profiles.id_profile =".$data[0]["id_profile"]."";    
                     $stmt2 = $conn->query ($sql2);
@@ -706,7 +706,7 @@ $address = $_POST['address'];
 
                 $conn = getConnection ();
 
-                $updateOrderSQL = "UPDATE orders set order_type = $ordertypeRecal, delivery_address = '$addressRecal' where id = $orderidRecal";
+                $updateOrderSQL = "UPDATE orders set order_type = $ordertypeRecal, delivery_address = '$addressRecal', updated_at = '".date('Y-m-d H:i:s')."' where id = $orderidRecal";
                 $updateTable = $conn->query ($updateOrderSQL);
                 $data = [];
                 if ($updateTable) {
@@ -872,11 +872,12 @@ $address = $_POST['address'];
                 break;
 
             case 'SetTipsAndDiscount':
-
+                $sessionkey = $_REQUEST["SessionKey"];
                 $tips = $_REQUEST["tips"];
                 $tip = $tips["tip"];
+                $tiptype = $tips["tiptype"];
                 $orderid = $_REQUEST["orderid"];
-                $clientPaymentSQL = "update orders set tip = $tip where id=$orderid";
+                $clientPaymentSQL = "update orders set tip = $tip, updated_at = '".date('Y-m-d H:i:s')."' where id=$orderid";
                 $conn = getConnection();
                 $stmt3 = $conn->query ($clientPaymentSQL);
 
@@ -1175,48 +1176,67 @@ $address = $_POST['address'];
                 echo json_encode($data);
                     break;
             case 'GetOrderForPay':
-                $data = array(
-                    "FrmParams" => array(
-                        "buttonLabel" => "10",
-                        "URL" => "10",
-                    ),
-                    "FrmInputs" => array(
-                        "x_login" => "10",
-                        "x_amount" => "10",
-                        "x_tip" => "10",
-                        "x_freight" => "10",
-                        "x_tax" => "10",
-                        "x_tax_exempt" => "10",
-                        "x_po_num" => "10",
-                        "x_description" => "10",
-                        "x_test_request" => "10",
-                        "x_invoice_num" => "10",
-                        "x_myorder_id" => "10",
-                        "x_fp_sequence" => "10",
-                        "x_fp_timestamp" => "10",
-                        "x_fp_hash" => "10",
-                        "x_show_form" => "10",
-                        "x_recurring_billing" => "10",
-                        "x_cust_id" => "10",
-                        "x_myclient_id" => "10",
-                        "x_zip" => "10",
-                        "x_address" => "10",
-                        "x_city" => "10",
-                        "x_state" => "10",
-                        "x_email" => "10",
-                        "x_email_customer" => "10",
-                        "x_first_name" => "10",
-                        "x_ship_to_zip" => "10",
-                        "x_ship_to_address" => "10",
-                        "x_ship_to_city" => "10",
-                        "x_ship_to_state" => "10",
-                        "x_ship_to_first_name" => "10",
-                        "x_relay_always" => "10",
-                        "x_relay_url" => "10",
-                        "x_relay_response" => "10",
-                        "string" => array("String1s","String2s"),
-                    ),
-                );
+                $sessionkey = $_REQUEST["SessionKey"];
+                $ordertype = $_REQUEST["ordertype"];
+                $paymenttype = $_REQUEST["paymenttype"];
+                $instructions = $_REQUEST["instructions"];
+                $address = $_REQUEST["address"];
+                $schedule = $_REQUEST["schedule"];
+                $orderid = $_REQUEST["orderid"];
+
+                $updateOrderFinalSQL = "UPDATE orders SET order_type = $ordertype, payment_type = '$paymenttype', instructions = '$instructions', delivery_address = '$address', schedule = '$schedule' WHERE id=$orderid";
+                $conn = getConnection();
+                //$resp = $conn->query($updateOrderFinalSQL);
+                if($resp){
+                    $frmInputSQL ="SELECT 
+                    tip as x_tip,
+                    tax_order as x_tax
+
+
+                     FROM orders where id=$orderid";
+                }
+                    $data = array(
+                        "FrmParams" => array(
+                            "buttonLabel" => "10",
+                            "URL" => "10",
+                        ),
+                        "FrmInputs" => array(
+                            "x_login" => "10",
+                            "x_amount" => "10",
+                            "x_tip" => "10",
+                            "x_freight" => "10",
+                            "x_tax" => "10",
+                            "x_tax_exempt" => "10",
+                            "x_po_num" => "10",
+                            "x_description" => "10",
+                            "x_test_request" => "10",
+                            "x_invoice_num" => "10",
+                            "x_myorder_id" => "10",
+                            "x_fp_sequence" => "10",
+                            "x_fp_timestamp" => "10",
+                            "x_fp_hash" => "10",
+                            "x_show_form" => "10",
+                            "x_recurring_billing" => "10",
+                            "x_cust_id" => "10",
+                            "x_myclient_id" => "10",
+                            "x_zip" => "10",
+                            "x_address" => "10",
+                            "x_city" => "10",
+                            "x_state" => "10",
+                            "x_email" => "10",
+                            "x_email_customer" => "10",
+                            "x_first_name" => "10",
+                            "x_ship_to_zip" => "10",
+                            "x_ship_to_address" => "10",
+                            "x_ship_to_city" => "10",
+                            "x_ship_to_state" => "10",
+                            "x_ship_to_first_name" => "10",
+                            "x_relay_always" => "10",
+                            "x_relay_url" => "10",
+                            "x_relay_response" => "10",
+                            "string" => array("String1s","String2s"),
+                        ),
+                    );
                 
                 header ('Content-Type: application/json');
                 echo json_encode($data);
@@ -1473,16 +1493,16 @@ $address = $_POST['address'];
                 $conn = getConnection ();
                 if(isset($_REQUEST["fullname"])){
                     $fullname = $_REQUEST["fullname"];
-                    $ClientProfileSQL = "update users set username = '$fullname' where id=$id";
+                    $ClientProfileSQL = "update users set username = '$fullname', updated_at = '".date('Y-m-d H:i:s')."' where id=$id";
                 }else if (isset($_REQUEST["mail"])){
                     $mail = $_REQUEST["mail"];
-                    $ClientProfileSQL = "update users set email = '$mail' where id=$id";
+                    $ClientProfileSQL = "update users set email = '$mail', updated_at = '".date('Y-m-d H:i:s')."' where id=$id";
 
                 }else if (isset($_REQUEST["OldPassword"])){
                     $OldPassword = $_REQUEST["OldPassword"];
                     $NewPassword = $_REQUEST["NewPassword"];
                     if(isPassword($conn, $sessionkey, $OldPassword) && isset($_REQUEST["NewPassword"])){
-                        $ClientProfileSQL = "update users set password = '$NewPassword' where id=$id";
+                        $ClientProfileSQL = "update users set password = '$NewPassword', updated_at = '".date('Y-m-d H:i:s')."' where id=$id";
 
                     }
                     //echo "bien";
@@ -1562,7 +1582,7 @@ $address = $_POST['address'];
                     sendMailRP($mail, "Reset Password", $newPassword);
                     $newPassword = sha1($newPassword);
                     $conn = getConnection ();
-                    $newPwdSQL = "update users set password = '$newPassword' where email='$mail'";
+                    $newPwdSQL = "update users set password = '$newPassword', updated_at = '".date('Y-m-d H:i:s')."' where email='$mail'";
                     $stmt = $conn->query ($newPwdSQL);
                     if($stmt){
                         $data["Success"] = "true";                        
@@ -1634,7 +1654,7 @@ case 'ClientLogOut':
     session_destroy(); 
     $conn = getConnection ();
     $sessionKey = $_REQUEST["SessionKey"];
-    $logoutSQL ="update users set remember_token = '".key_random(60)."' where id=".getIDByToken($sessionKey);
+    $logoutSQL ="update users set remember_token = '".key_random(60)."', updated_at = '".date('Y-m-d H:i:s')."' where id=".getIDByToken($sessionKey);
     $stmt = $conn->query ($logoutSQL);
     $data = [];
     if($stmt){
@@ -1966,7 +1986,7 @@ case 'RateRestaurantOrder':
         $values .= ", comment_rate = '$description'";
     }
     $id = getIDByToken($sessionkey);
-    $rateSQL = "UPDATE orders SET ".$values." WHERE id = $orderid";
+    $rateSQL = "UPDATE orders SET ".$values.", updated_at = '".date('Y-m-d H:i:s')."' WHERE id = $orderid";
     $conn = getConnection ();
     $stmt = $conn->query ($rateSQL);
     $data = [];
@@ -1998,7 +2018,7 @@ case 'SetDefaultClientAddress':
     $sk = $_REQUEST["SessionKey"];
     $clientaddressid = $_REQUEST["ClientAddressID"];
     $conn = getConnection ();    
-    $setDefaultSQL = "UPDATE direcciones_clientes SET direcciones_clientes.default = 1 WHERE id = $clientaddressid";
+    $setDefaultSQL = "UPDATE direcciones_clientes SET direcciones_clientes.default = 1 , updated_at = '".date('Y-m-d H:i:s')."' WHERE id = $clientaddressid";
     $stmt = $conn->query ($setDefaultSQL);
     if($stmt){
         $data["Success"] = "true";
@@ -2025,23 +2045,29 @@ case 'GetBanners':
     echo json_encode($data);
     break;
 case 'GetDefaultUserAddress':
-    $data = [
-        "ClientAddress" => [
-            "ClientAddressID" => "16",
-            "ClientID" => "16",
-            "Address" => "16",
-            "Suit" => "16",
-            "City" => "16",
-            "State" => "16",
-            "ZIPCode" => "16",
-            "CrossStreet" => "16",
-            "Phone" => "16",
-            "AddressName" => "16",
-            "CreationDate" => "16",
-            "Default" => "16",
-            "Enable" => "16",
-        ]
-    ];
+    $SessionKey = $_REQUEST['SessionKey'];
+    $conn = getConnection();
+    $id = getIDByToken($SessionKey);
+    /*    
+        $data = [
+            "ClientAddress" => [
+                "ClientAddressID" => "16",
+                "ClientID" => "16",
+                "Address" => "16",
+                "Suit" => "16",
+                "City" => "16",
+                "State" => "16",
+                "ZIPCode" => "16",
+                "CrossStreet" => "16",
+                "Phone" => "16",
+                "AddressName" => "16",
+                "CreationDate" => "16",
+                "Default" => "16",
+                "Enable" => "16",
+            ]
+        ];
+    */
+    $data["ClientAddress"] = getAddressID($id, $conn, true);
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;
@@ -2067,72 +2093,76 @@ case 'GetProductComments':
 
 function getAddress($SessionKey, $conn, $sd = 'ClientAddress'){
     $colums = "id As ClientAddressID, ";
-                $colums .= "idUser As ClientID, ";
-                $colums .= "type_address As Address, ";
-                $colums .= "apt As Suit, ";
-                $colums .= "city As City, ";
-                $colums .= "state As State, ";
-                $colums .= "zipcode As ZIPCode, ";
-                $colums .= "cross_street As CrossStreet, ";
-                $colums .= "phone As Phone, ";
-                $colums .= "address As AddressName, ";
-                $colums .= "created_at As CreationDate, ";
-                $colums .= "direcciones_clientes.default As 'Default', ";
-                $colums .= "id As 'Enable'"; //pendiente
-                //echo $sql;
-                try {
-                    $sql = "select ".$colums." from direcciones_clientes where iduser=".$SessionKey."";
-                    $stmt = $conn->query($sql);
-                    if($stmt){
-                        $result = $stmt->fetchAll (PDO::FETCH_ASSOC);
-                        $data = array(
-                            'Success' => 'true',
-                            $sd => $result,
-                        );
-                    }else{
-                        $data=["errorResponse"=>"query error DB"] ;                            
-                    }
+    $colums .= "idUser As ClientID, ";
+    $colums .= "type_address As Address, ";
+    $colums .= "apt As Suit, ";
+    $colums .= "city As City, ";
+    $colums .= "state As State, ";
+    $colums .= "zipcode As ZIPCode, ";
+    $colums .= "cross_street As CrossStreet, ";
+    $colums .= "phone As Phone, ";
+    $colums .= "address As AddressName, ";
+    $colums .= "created_at As CreationDate, ";
+    $colums .= "direcciones_clientes.default As 'Default', ";
+    $colums .= "id As 'Enable'"; //pendiente
+    //echo $sql;
+    try {
+        $sql = "select ".$colums." from direcciones_clientes where iduser=".$SessionKey."";
+        $stmt = $conn->query($sql);
+        if($stmt){
+            $result = $stmt->fetchAll (PDO::FETCH_ASSOC);
+            $data = array(
+                'Success' => 'true',
+                $sd => $result,
+            );
+        }else{
+            $data=["errorResponse"=>"query error DB"] ;                            
+        }
 
-                    header ('Content-Type: application/json');
-                    
-                } catch (Exception $e) {
-                        $data=["errorResponse"=>"query error DB"] ;                            
-                    header ('Content-Type: application/json');
-                }
-                return ($data);
+        header ('Content-Type: application/json');
+        
+    } catch (Exception $e) {
+            $data=["errorResponse"=>"query error DB"] ;                            
+        header ('Content-Type: application/json');
+    }
+    return ($data);
 }
-function getAddressID($id, $conn){
+function getAddressID($id, $conn, $default = false){
     $colums = "id As ClientAddressID, ";
-                $colums .= "idUser As ClientID, ";
-                $colums .= "type_address As Address, ";
-                $colums .= "apt As Suit, ";
-                $colums .= "city As City, ";
-                $colums .= "state As State, ";
-                $colums .= "zipcode As ZIPCode, ";
-                $colums .= "cross_street As CrossStreet, ";
-                $colums .= "phone As Phone, ";
-                $colums .= "address As AddressName, ";
-                $colums .= "created_at As CreationDate, ";
-                $colums .= "direcciones_clientes.default As 'Default', ";
-                $colums .= "id As 'Enable'"; //pendiente
-                //echo $sql;
-                try {
-                    $sql = "select ".$colums." from direcciones_clientes where id=".$id."";
-                    $stmt = $conn->query($sql);
-                    if($stmt){
-                        $result = $stmt->fetchAll (PDO::FETCH_ASSOC);
-                        $data = $result[0];
-                    }else{
-                        $data=["errorResponse"=>"query error DB"] ;                            
-                    }
+    $colums .= "idUser As ClientID, ";
+    $colums .= "type_address As Address, ";
+    $colums .= "apt As Suit, ";
+    $colums .= "city As City, ";
+    $colums .= "state As State, ";
+    $colums .= "zipcode As ZIPCode, ";
+    $colums .= "cross_street As CrossStreet, ";
+    $colums .= "phone As Phone, ";
+    $colums .= "address As AddressName, ";
+    $colums .= "created_at As CreationDate, ";
+    $colums .= "direcciones_clientes.default As 'Default', ";
+    $colums .= "id As 'Enable'"; //pendiente
+    //echo $sql;
+    try {
+        $sql = "select ".$colums." from direcciones_clientes where id=".$id."";
+        if($default){
+            $sql = "select ".$colums." from direcciones_clientes where iduser=".$id."";
+            $sql.=" and direcciones_clientes.default = 1";
+        }
+        $stmt = $conn->query($sql);
+        if($stmt){
+            $result = $stmt->fetchAll (PDO::FETCH_ASSOC);
+            $data = $result[0];
+        }else{
+            $data=["errorResponse"=>"query error DB"] ;                            
+        }
 
-                    header ('Content-Type: application/json');
-                    
-                } catch (Exception $e) {
-                        $data=["errorResponse"=>"query error DB"] ;                            
-                    header ('Content-Type: application/json');
-                }
-                return ($data);
+        header ('Content-Type: application/json');
+        
+    } catch (Exception $e) {
+            $data=["errorResponse"=>"query error DB"] ;                            
+        header ('Content-Type: application/json');
+    }
+    return ($data);
 }
 function key_random($length = 16)
 {
