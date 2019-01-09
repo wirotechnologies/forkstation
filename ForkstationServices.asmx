@@ -858,23 +858,24 @@ $address = $jsonData->address;
             /* --- List Coupons */
             $listCouponsOut = $dom->createElement('ListCoupons');
 
-            foreach ($listCouponsProductsMenus as $couponProductMenu) {
+            //foreach ($listCouponsProductsMenus as $couponProductMenu) {
+            foreach ($restaurant["listCoupon"] as $couponProductMenu) {
 
                 /* --- List Coupons Product Menu */
                 $listCouponsProductMenuOut = $dom->createElement('ProductMenuOut');
 
-                $listCouponsProductID = $dom->createElement('ProductID', $couponProductMenu['product_id']);
-                $listCouponsProductName = $dom->createElement('Name', $couponProductMenu['name']);
-                $listCouponsProductDescription = $dom->createElement('Description', $couponProductMenu['description']);
-                $listCouponsProductValue = $dom->createElement('Value', $couponProductMenu['value']);
-                $listCouponsProductImg = $dom->createElement('ProductImg', $couponProductMenu['image']);
-                $listCouponsProductEnable = $dom->createElement('Enable', $couponProductMenu['enable']);
-                $listCouponsProductCategoryID = $dom->createElement('CategoryID', $couponProductMenu['category_id']);
-                $listCouponsProductCategory = $dom->createElement('Category', $couponProductMenu['category']);
-                $listCouponsProductCreationDate = $dom->createElement('CreationDate', $couponProductMenu['created_at']);
-                $listCouponsProductOrder = $dom->createElement('ProductOrder', $couponProductMenu['product_order']);
-                $listCouponsProductCategoryOrder = $dom->createElement('CategoryOrder', $couponProductMenu['category_order']);
-                $listCouponsProductMenuID = $dom->createElement('MenuID', $couponProductMenu['menu_id']);
+                $listCouponsProductID = $dom->createElement('ProductID', $couponProductMenu['ProductID']);
+                $listCouponsProductName = $dom->createElement('Name', $couponProductMenu['Name']);
+                $listCouponsProductDescription = $dom->createElement('Description', $couponProductMenu['Description']);
+                $listCouponsProductValue = $dom->createElement('Value', $couponProductMenu['Value']);
+                $listCouponsProductImg = $dom->createElement('ProductImg', $couponProductMenu['ProductImg']);
+                $listCouponsProductEnable = $dom->createElement('Enable', $couponProductMenu['Enable']);
+                $listCouponsProductCategoryID = $dom->createElement('CategoryID', $couponProductMenu['CategoryID']);
+                $listCouponsProductCategory = $dom->createElement('Category', $couponProductMenu['Category']);
+                $listCouponsProductCreationDate = $dom->createElement('CreationDate', $couponProductMenu['CreationDate']);
+                $listCouponsProductOrder = $dom->createElement('ProductOrder', $couponProductMenu['ProductOrder']);
+                $listCouponsProductCategoryOrder = $dom->createElement('CategoryOrder', $couponProductMenu['CategoryOrder']);
+                $listCouponsProductMenuID = $dom->createElement('MenuID', $couponProductMenu['MenuID']);
 
                 $listCouponsProductMenuOut->appendChild($listCouponsProductID);
                 $listCouponsProductMenuOut->appendChild($listCouponsProductName);

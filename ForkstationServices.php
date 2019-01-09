@@ -216,13 +216,16 @@ $address = $_POST['address'];
 
                 foreach ($data as $row) {
                     $list = getDishesRestaurantMenu($row["id"], $conn);
+                    //$pCoupon = getDishesRestaurantMenu($row["id"], $conn);
                     $row["listdishes"] = $list;
                     $restaurantsMenus[] = $row;
                 }
 
                 foreach ($dataRestaurant as $row2) {
                     $list = getDishesRestaurantFavorite($row2["id"], $conn);
+                    $pCoupon = getDishesRestaurantFavorite($row2["id"], $conn, 0, true);
                     $row2["listdishes"] = $list;
+                    $row2["listCoupon"] = $pCoupon;
                     $restaurantInfo[] = $row2;
                 }
 
@@ -883,13 +886,20 @@ $address = $_POST['address'];
 
             case 'SetTipsAndDiscount':
                 $sessionkey = $_REQUEST["SessionKey"];
-                $tips = $_REQUEST["tips"];
-                $tip = $tips["tip"];
-                $tiptype = $tips["tiptype"];
                 $orderid = $_REQUEST["orderid"];
-                $clientPaymentSQL = "update orders set tip = $tip, updated_at = '".date('Y-m-d H:i:s')."' where id=$orderid";
+                $tips = $_REQUEST["tips"];
                 $conn = getConnection();
-                $stmt3 = $conn->query ($clientPaymentSQL);
+                if (isset($tips)) {
+                    $tip = $tips["tip"];
+                    $tiptype = $tips["tiptype"];
+                    $clientPaymentSQL = "update orders set tip = $tip, updated_at = '".date('Y-m-d H:i:s')."' where id=$orderid";
+                    $stmt3 = $conn->query ($clientPaymentSQL);
+                }else{
+                    $coupon = $_REQUEST["couponid"];
+                    $clientPaymentSQL = "update orders set cupon_id = '$coupon', updated_at = '".date('Y-m-d H:i:s')."' where id=$orderid";
+                    $stmt3 = $conn->query ($clientPaymentSQL);
+                    
+                }
 
                     //$clientPaymentData = $stmt3->fetchAll (PDO::FETCH_ASSOC);
                     
@@ -2465,11 +2475,13 @@ function randomPassword() {
     return implode($pass); //turn the array into a string
 }
 
-function getDishesRestaurantFavorite($menuRestaurantID, $conn, $pag = 0){
+function getDishesRestaurantFavorite($menuRestaurantID, $conn, $pag = 0, $coupon = false){
 //AS ProductImg
 //AS Enable
     $dataforPage = 20;
     $offset = $dataforPage*$pag;
+    $condition = $coupon ? "restaurant_menu.coupons = 1" : "menu_dishes.favorite = 1";
+
     $menuRestaurantDishesSQL = "SELECT 
     menu_dishes.id AS ProductID,
     menu_dishes.name AS Name,
@@ -2482,7 +2494,7 @@ function getDishesRestaurantFavorite($menuRestaurantID, $conn, $pag = 0){
     menu_categorias.order AS CategoryOrder,
     menu_categorias.idmenu AS MenuID
     FROM restaurant_menu, menu_categorias, menu_dishes 
-    WHERE restaurant_menu.idrestaurant = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria and menu_dishes.favorite = 1";
+    WHERE restaurant_menu.idrestaurant = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria and $condition";
 //    WHERE restaurant_menu.idrestaurant = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria and menu_dishes.favorite = 1 LIMIT ".$dataforPage." OFFSET ".$offset;
 
     $stmt = $conn->query($menuRestaurantDishesSQL);
