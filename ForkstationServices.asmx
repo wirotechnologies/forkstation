@@ -368,7 +368,8 @@ $address = $jsonData->address;
             /* Favorite Disch*/
             $listFavoriteDisch = $dom->createElement('ListFavoriteDisch');
 
-            foreach ($restaurantMenuProducts as $menuProduct) {
+            //foreach ($restaurantMenuProducts as $menuProduct) {
+            foreach ($restaurant["listdishes"] as $menuProduct) {
 
                 /* --- Product Menu */
                 $productMenuOut = $dom->createElement('ProductMenuOut');
@@ -599,7 +600,10 @@ $address = $jsonData->address;
         curl_setopt($ch, CURLOPT_URL, $urlServices);
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array('restaurant_id' => $restaurantID, 'op' => $op)));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
+            'restaurant_id' => $restaurantID, 
+            //'restaurant_id' => $_REQUEST["RestaurantID"],
+            'op' => $op)));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         $result = curl_exec($ch);
@@ -628,21 +632,22 @@ $address = $jsonData->address;
             $restaurantMenuOut->appendChild($menuRestaurantIsMaster);
             $restaurantMenuOut->appendChild($menuRestaurantMenuID);
 
-            foreach($restaurantMenuProducts as $menuProduct) {
+            //foreach($restaurantMenuProducts as $menuProduct) {
+            foreach($menu["listdishes"] as $menuProduct) {
 
                 $restaurantMenuProductOut = $dom->createElement('ProductOut');
 
-                $menuRestaurantProductID = $dom->createElement('ProductID', $menuProduct['product_id']);
-                $menuRestaurantProductName = $dom->createElement('Name', $menuProduct['name']);
-                $menuRestaurantProductDescription = $dom->createElement('Description', $menuProduct['description']);
-                $menuRestaurantProductValue = $dom->createElement('Value', $menuProduct['value']);
-                $menuRestaurantProductImage = $dom->createElement('ProductImg', $menuProduct['image']);
-                $menuRestaurantProductEnable = $dom->createElement('Enable', $menuProduct['enable']);
-                $menuRestaurantProductCategoryID = $dom->createElement('CategoryID', $menuProduct['category_id']);
-                $menuRestaurantProductCategory = $dom->createElement('Category', $menuProduct['']);
-                $menuRestaurantProductCreationDate = $dom->createElement('CreationDate', $menuProduct['created_at']);
-                $menuRestaurantProductProductOrder = $dom->createElement('ProductOrder', $menuProduct['product_order']);
-                $menuRestaurantProductCategoryOrder = $dom->createElement('CategoryOrder', $menuProduct['category_order']);
+                $menuRestaurantProductID = $dom->createElement('ProductID', $menuProduct['ProductID']);
+                $menuRestaurantProductName = $dom->createElement('Name', $menuProduct['Name']);
+                $menuRestaurantProductDescription = $dom->createElement('Description', $menuProduct['Description']);
+                $menuRestaurantProductValue = $dom->createElement('Value', $menuProduct['Value']);
+                $menuRestaurantProductImage = $dom->createElement('ProductImg', $menuProduct['ProductImg']);
+                $menuRestaurantProductEnable = $dom->createElement('Enable', $menuProduct['Enable']);
+                $menuRestaurantProductCategoryID = $dom->createElement('CategoryID', $menuProduct['CategoryID']);
+                $menuRestaurantProductCategory = $dom->createElement('Category', $menuProduct['Category']);
+                $menuRestaurantProductCreationDate = $dom->createElement('CreationDate', $menuProduct['CreationDate']);
+                $menuRestaurantProductProductOrder = $dom->createElement('ProductOrder', $menuProduct['ProductOrder']);
+                $menuRestaurantProductCategoryOrder = $dom->createElement('CategoryOrder', $menuProduct['CategoryOrder']);
 
                 $restaurantMenuProductOut->appendChild($menuRestaurantProductID);
                 $restaurantMenuProductOut->appendChild($menuRestaurantProductName);
@@ -768,23 +773,24 @@ $address = $jsonData->address;
             /* Favorite Disch*/
             $listFavoriteDisch = $dom->createElement('ListFavoriteDisch');
 
-            foreach ($restaurantMenuProducts as $menuProduct) {
+            //foreach ($restaurantMenuProducts as $menuProduct) {
+            foreach ($restaurant["listdishes"] as $menuProduct) {
 
                 /* --- Product Menu */
                 $productMenuOut = $dom->createElement('ProductMenuOut');
 
-                $productID = $dom->createElement('ProductID', 1);
-                $productName = $dom->createElement('Name', 1);
-                $productDescription = $dom->createElement('Description', 1);
-                $productValue = $dom->createElement('Value', 1);
-                $productImg = $dom->createElement('ProductImg', 1);
-                $productEnable = $dom->createElement('Enable', 1);
-                $productCategoryID = $dom->createElement('CategoryID', 1);
-                $productCategory = $dom->createElement('Category', 1);
-                $productCreationDate = $dom->createElement('CreationDate', 1);
-                $productOrder = $dom->createElement('ProductOrder', 1);
-                $productCategoryOrder = $dom->createElement('CategoryOrder', 1);
-                $productMenuID = $dom->createElement('MenuID', 1);
+                $productID = $dom->createElement('ProductID', $menuProduct["ProductID"]);
+                $productName = $dom->createElement('Name', $menuProduct["Name"]);
+                $productDescription = $dom->createElement('Description', $menuProduct["Description"]);
+                $productValue = $dom->createElement('Value', $menuProduct["Value"]);
+                $productImg = $dom->createElement('ProductImg', $menuProduct["ProductImg"]);
+                $productEnable = $dom->createElement('Enable', $menuProduct["Enable"]);
+                $productCategoryID = $dom->createElement('CategoryID', $menuProduct["CategoryID"]);
+                $productCategory = $dom->createElement('Category', $menuProduct["Category"]);
+                $productCreationDate = $dom->createElement('CreationDate', $menuProduct["CreationDate"]);
+                $productOrder = $dom->createElement('ProductOrder', $menuProduct["ProductOrder"]);
+                $productCategoryOrder = $dom->createElement('CategoryOrder', $menuProduct["CategoryOrder"]);
+                $productMenuID = $dom->createElement('MenuID', $menuProduct["MenuID"]);
 
                 $productMenuOut->appendChild($productID);
                 $productMenuOut->appendChild($productName);

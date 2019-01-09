@@ -1,5 +1,9 @@
 <?php
-include_once("vendor/paragonie/random_compat/lib/random.php");
+//include_once("vendor/paragonie/random_compat/lib/random.php");
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+include_once("vendor/autoload.php");
 session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 0);
@@ -118,6 +122,8 @@ $address = $_POST['address'];
                     $restaurants[] = $row;
                     $restaurants[$i]['miles'] = (String)round ($row['distance'] / 1609.344, 1);
                     $restaurants[$i]['kilometers'] = (String)round ($row['distance'] / 1000, 1);
+                    $list = getDishesRestaurantFavorite($row["id"], $conn);
+                    $restaurants[$i]["listdishes"] = $list;
                     $i++;
                 }
 
@@ -209,10 +215,14 @@ $address = $_POST['address'];
                 $dataRestaurant = $stmt2->fetchAll(PDO::FETCH_ASSOC);
 
                 foreach ($data as $row) {
+                    $list = getDishesRestaurantMenu($row["id"], $conn);
+                    $row["listdishes"] = $list;
                     $restaurantsMenus[] = $row;
                 }
 
                 foreach ($dataRestaurant as $row2) {
+                    $list = getDishesRestaurantFavorite($row2["id"], $conn);
+                    $row2["listdishes"] = $list;
                     $restaurantInfo[] = $row2;
                 }
 
@@ -2112,6 +2122,39 @@ case 'GetProductComments':
     header ('Content-Type: application/json');
     echo json_encode($data);
     break;
+    case "test":
+       $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
+        try {
+            //Server settings
+            $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+            $mail->isSMTP();                                      // Set mailer to use SMTP
+            $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+            $mail->SMTPAuth = true;                               // Enable SMTP authentication
+            $mail->Username = 'crhisdlm94@gmail.com';                 // SMTP username
+            $mail->Password = 'apofis1151';                           // SMTP password
+            $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+            $mail->Port = 587;                                    // TCP port to connect to
+
+            //Recipients
+            $mail->setFrom('crhisdlm94@gmail.com', 'Mailer');
+            $mail->addAddress('cristian.lucumi00@usc.edu.co', 'cristian');     // Add a recipient
+            //$mail->addAddress('ellen@example.com');               // Name is optional
+            $mail->addReplyTo('info@example.com', 'Information');
+            $mail->addCC('cc@example.com');
+            $mail->addBCC('bcc@example.com');
+
+            //Content
+            $mail->isHTML(true);                                  // Set email format to HTML
+            $mail->Subject = 'Here is the subject';
+            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+
+            $mail->send();
+            echo 'Message has been sent';
+        } catch (Exception $e) {
+            echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+        }
+        break;
 
 }     
 
@@ -2420,4 +2463,56 @@ function randomPassword() {
         $pass[] = $alphabet[$n];
     }
     return implode($pass); //turn the array into a string
+}
+
+function getDishesRestaurantFavorite($menuRestaurantID, $conn, $pag = 0){
+//AS ProductImg
+//AS Enable
+    $dataforPage = 20;
+    $offset = $dataforPage*$pag;
+    $menuRestaurantDishesSQL = "SELECT 
+    menu_dishes.id AS ProductID,
+    menu_dishes.name AS Name,
+    menu_dishes.name AS Description,
+    menu_dishes.value AS Value,
+    menu_categorias.id AS CategoryID,
+    menu_categorias.name AS Category,
+    menu_dishes.created_at AS CreationDate,
+    menu_dishes.order AS ProductOrder,
+    menu_categorias.order AS CategoryOrder,
+    menu_categorias.idmenu AS MenuID
+    FROM restaurant_menu, menu_categorias, menu_dishes 
+    WHERE restaurant_menu.idrestaurant = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria and menu_dishes.favorite = 1";
+//    WHERE restaurant_menu.idrestaurant = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria and menu_dishes.favorite = 1 LIMIT ".$dataforPage." OFFSET ".$offset;
+
+    $stmt = $conn->query($menuRestaurantDishesSQL);
+    $data = [];
+    if ($stmt) {
+        $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+    }
+    return $data;
+}
+function getDishesRestaurantMenu($menuRestaurantID, $conn, $pag = 0){
+//AS ProductImg
+//AS Enable
+    $offset = 85*$pag;
+    $menuRestaurantDishesSQL = "SELECT 
+    menu_dishes.id AS ProductID,
+    menu_dishes.name AS Name,
+    menu_dishes.name AS Description,
+    menu_dishes.value AS Value,
+    menu_categorias.id AS CategoryID,
+    menu_categorias.name AS Category,
+    menu_dishes.created_at AS CreationDate,
+    menu_dishes.order AS ProductOrder,
+    menu_categorias.order AS CategoryOrder,
+    menu_categorias.idmenu AS MenuID
+    FROM restaurant_menu, menu_categorias, menu_dishes 
+    WHERE restaurant_menu.id = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria";
+    $stmt = $conn->query($menuRestaurantDishesSQL);
+    $data = [];
+    if ($stmt) {
+        $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+    }
+    return $data;
 }
