@@ -217,6 +217,14 @@ $address = $_POST['address'];
                 foreach ($data as $row) {
                     $list = getDishesRestaurantMenu($row["id"], $conn);
                     //$pCoupon = getDishesRestaurantMenu($row["id"], $conn);
+                    foreach ($list as $key => $value) {
+                        $properties = getPropertiesProduct($value["ProductID"], $conn);
+                        foreach ($properties as $key2 => $value2) {
+                            $properties[$key2]["ProductsPropertyValues"] = getMenuAdds($value2["id"], $conn);
+                        }
+                        $list[$key]["MenuProductsProperty"] = $properties;
+
+                    }
                     $row["listdishes"] = $list;
                     $restaurantsMenus[] = $row;
                 }
@@ -224,6 +232,14 @@ $address = $_POST['address'];
                 foreach ($dataRestaurant as $row2) {
                     $list = getDishesRestaurantFavorite($row2["id"], $conn);
                     $pCoupon = getDishesRestaurantFavorite($row2["id"], $conn, 0, true);
+                    foreach ($list as $key => $value) {
+                        $properties = getPropertiesProduct($value["ProductID"], $conn);
+                        foreach ($properties as $key2 => $value2) {
+                            $properties[$key2]["ProductsPropertyValues"] = getMenuAdds($value2["id"], $conn);
+                        }
+                        $list[$key]["MenuProductsProperty"] = $properties;
+
+                    }
                     $row2["listdishes"] = $list;
                     $row2["listCoupon"] = $pCoupon;
                     $restaurantInfo[] = $row2;
@@ -590,14 +606,23 @@ $address = $_POST['address'];
                 foreach ($items as $value) {
                     $sql2 = "INSERT into order_detail (idorder, type, idproduct, quantity, value, created_at, updated_at) values ($idOrderNew, 1, ".$value["productid"].", ".$value["quantity"].", ".$value["productvalue"].", '".date('Y-m-d H:i:s')."', '".date('Y-m-d H:i:s')."')";
                         //$id = $stmt->fetchAll (PDO::FETCH_ASSOC);
+                    $exito = false;
                     try {
                         $conn->beginTransaction();
                         $conn->exec($sql2);
+                        $idLastDishes = $conn->lastInsertId();
                         $conn->commit();
+                        $exito = true;
                         //echo $sql;
                     } catch (Exception $e) {
-                      $conn->rollBack();
+                        $conn->rollBack();
                       //echo "Failed: " . $e->getMessage();
+                        $exito = false;
+                    }
+                    if($exito){
+                        foreach ($value["properties"] as $key2 => $value2) {
+                            $orderDAddsSQL = "INSERT INTO order_detail (idorder, type, idproduct, quantity, value, created_at, updated_at) VALUES ($idOrderNew, 2, ".$value2["id"].", )";
+                        }
                     }
                 }
 
@@ -2133,36 +2158,52 @@ case 'GetProductComments':
     echo json_encode($data);
     break;
     case "test":
-       $mail = new PHPMailer(true);                              // Passing `true` enables exceptions
-        try {
-            //Server settings
-            $mail->SMTPDebug = 2;                                 // Enable verbose debug output
-            $mail->isSMTP();                                      // Set mailer to use SMTP
-            $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
-            $mail->SMTPAuth = true;                               // Enable SMTP authentication
-            $mail->Username = 'crhisdlm94@gmail.com';                 // SMTP username
-            $mail->Password = 'apofis1151';                           // SMTP password
-            $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
-            $mail->Port = 587;                                    // TCP port to connect to
+       if(false){$mail = new PHPMailer(true);                              // Passing `true` enables exceptions
+               try {
+                   //Server settings
+                   $mail->SMTPDebug = 2;                                 // Enable verbose debug output
+                   $mail->isSMTP();                                      // Set mailer to use SMTP
+                   $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+                   $mail->SMTPAuth = true;                               // Enable SMTP authentication
+                   $mail->Username = 'crhisdlm94@gmail.com';                 // SMTP username
+                   $mail->Password = 'apofis1151';                           // SMTP password
+                   $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+                   $mail->Port = 587;                                    // TCP port to connect to
+       
+                   //Recipients
+                   $mail->setFrom('crhisdlm94@gmail.com', 'Mailer');
+                   $mail->addAddress('cristian.lucumi00@usc.edu.co', 'cristian');     // Add a recipient
+                   //$mail->addAddress('ellen@example.com');               // Name is optional
+                   $mail->addReplyTo('info@example.com', 'Information');
+                   $mail->addCC('cc@example.com');
+                   $mail->addBCC('bcc@example.com');
+       
+                   //Content
+                   $mail->isHTML(true);                                  // Set email format to HTML
+                   $mail->Subject = 'Here is the subject';
+                   $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
+                   $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+       
+                   $mail->send();
+                   echo 'Message has been sent';
+               } catch (Exception $e) {
+                   echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+               }}
 
-            //Recipients
-            $mail->setFrom('crhisdlm94@gmail.com', 'Mailer');
-            $mail->addAddress('cristian.lucumi00@usc.edu.co', 'cristian');     // Add a recipient
-            //$mail->addAddress('ellen@example.com');               // Name is optional
-            $mail->addReplyTo('info@example.com', 'Information');
-            $mail->addCC('cc@example.com');
-            $mail->addBCC('bcc@example.com');
-
-            //Content
-            $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = 'Here is the subject';
-            $mail->Body    = 'This is the HTML message body <b>in bold!</b>';
-            $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-
-            $mail->send();
-            echo 'Message has been sent';
-        } catch (Exception $e) {
-            echo 'Message could not be sent. Mailer Error: ', $mail->ErrorInfo;
+        if(false){
+            $conn = getConnection();
+         
+            try {
+                    $conn->beginTransaction();
+                    $conn->exec("INSERT INTO `comments` (`id`, `idnota`, `detalle`, `user`, `created_at`, `updated_at`) VALUES (NULL, '1', 'de', '993', '2019-01-10 00:00:00', '2019-01-10 00:00:00')");
+                    $id = $conn->lastInsertId();
+                    $conn->commit();
+                    //echo $sql;
+                } catch (Exception $e) {
+                  $conn->rollBack();
+                  //echo "Failed: " . $e->getMessage();
+                }
+            var_dump($id);
         }
         break;
 
@@ -2478,7 +2519,7 @@ function randomPassword() {
 function getDishesRestaurantFavorite($menuRestaurantID, $conn, $pag = 0, $coupon = false){
 //AS ProductImg
 //AS Enable
-    $dataforPage = 20;
+    $dataforPage = 80;
     $offset = $dataforPage*$pag;
     $condition = $coupon ? "restaurant_menu.coupons = 1" : "menu_dishes.favorite = 1";
 
@@ -2495,7 +2536,7 @@ function getDishesRestaurantFavorite($menuRestaurantID, $conn, $pag = 0, $coupon
     menu_categorias.idmenu AS MenuID
     FROM restaurant_menu, menu_categorias, menu_dishes 
     WHERE restaurant_menu.idrestaurant = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria and $condition";
-//    WHERE restaurant_menu.idrestaurant = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria and menu_dishes.favorite = 1 LIMIT ".$dataforPage." OFFSET ".$offset;
+    //WHERE restaurant_menu.idrestaurant = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria and $condition LIMIT ".$dataforPage." OFFSET ".$offset;
 
     $stmt = $conn->query($menuRestaurantDishesSQL);
     $data = [];
@@ -2522,6 +2563,44 @@ function getDishesRestaurantMenu($menuRestaurantID, $conn, $pag = 0){
     FROM restaurant_menu, menu_categorias, menu_dishes 
     WHERE restaurant_menu.id = $menuRestaurantID AND menu_categorias.idmenu = restaurant_menu.id AND menu_categorias.id = menu_dishes.idcategoria";
     $stmt = $conn->query($menuRestaurantDishesSQL);
+    $data = [];
+    if ($stmt) {
+        $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+    }
+    return $data;
+}
+function getPropertiesProduct($dishesID, $conn){
+    $propertyProductSQL = "SELECT 
+    id,
+    iddishes,
+    name,
+    quantity,
+    operation,
+    mandatory,
+    menu_property.order,
+    created_at,
+    updated_at 
+    FROM menu_property WHERE iddishes = $dishesID";
+    //echo $propertyProductSQL."\n";
+
+    $stmt = $conn->query($propertyProductSQL);
+    $data = [];
+    if ($stmt) {
+        $data = $stmt->fetchAll (PDO::FETCH_ASSOC);
+    }
+    return $data;
+}
+function getMenuAdds($propertyID, $conn){
+    $propertyProductSQL = "SELECT 
+    id,
+    idproperty,
+    name,
+    price,
+    menu_adds.order,
+    created_at,
+    updated_at 
+    FROM menu_adds WHERE idproperty = $propertyID";
+    $stmt = $conn->query($propertyProductSQL);
     $data = [];
     if ($stmt) {
         $data = $stmt->fetchAll (PDO::FETCH_ASSOC);

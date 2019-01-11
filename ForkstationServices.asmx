@@ -601,8 +601,8 @@ $address = $jsonData->address;
         curl_setopt($ch, CURLOPT_HEADER, 0);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-            'restaurant_id' => $restaurantID, 
-            //'restaurant_id' => $_REQUEST["RestaurantID"],
+            //'restaurant_id' => $restaurantID, 
+            'restaurant_id' => $_REQUEST["restaurant_id"],
             'op' => $op)));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
@@ -661,16 +661,17 @@ $address = $jsonData->address;
                 $restaurantMenuProductOut->appendChild($menuRestaurantProductProductOrder);
                 $restaurantMenuProductOut->appendChild($menuRestaurantProductCategoryOrder);
 
-                foreach($restaurantMenuProductsProperty as $menuProductProperty) {
+                //foreach($restaurantMenuProductsProperty as $menuProductProperty) {
+                foreach($menuProduct["MenuProductsProperty"] as $menuProductProperty) {
 
                     $restaurantMenuPropertyOut = $dom->createElement('ProductPropertyOut');
 
-                    $menuRestaurantProductPropertyID = $dom->createElement('ProductPropertyID', $menuProductProperty['product_property_id']);
-                    $menuRestaurantProductPropertyProductID = $dom->createElement('ProductD', $menuProductProperty['product_property_product_id']);
-                    $menuRestaurantProductPropertyFatherPropertyID = $dom->createElement('FatherProductPropertyID', $menuProductProperty['produt_property_father_property_id']);
+                    $menuRestaurantProductPropertyID = $dom->createElement('ProductPropertyID', $menuProductProperty['id']);
+                    $menuRestaurantProductPropertyProductID = $dom->createElement('ProductD', $menuProductProperty['id']);
+                    $menuRestaurantProductPropertyFatherPropertyID = $dom->createElement('FatherProductPropertyID', $menuProductProperty['iddishes']);
                     $menuRestaurantProductPropertyName = $dom->createElement('Name', $menuProductProperty['name']);
                     $menuRestaurantProductPropertyType = $dom->createElement('PropertyType', $menuProductProperty['property_type']);
-                    $menuRestaurantProductPropertyGroupingTypeID = $dom->createElement('GroupingTypeID', $menuProductProperty['grouping_type_id']);
+                    $menuRestaurantProductPropertyGroupingTypeID = $dom->createElement('GroupingTypeID', $menuProductProperty['operation']);
                     $menuRestaurantProductPropertyGroupingType = $dom->createElement('GroupingType', $menuProductProperty['grouping_type']);
 
                     $restaurantMenuPropertyOut->appendChild($menuRestaurantProductPropertyID);
@@ -681,15 +682,16 @@ $address = $jsonData->address;
                     $restaurantMenuPropertyOut->appendChild($menuRestaurantProductPropertyGroupingTypeID);
                     $restaurantMenuPropertyOut->appendChild($menuRestaurantProductPropertyGroupingType);
 
-                    foreach($restaurantMenuProductsPropertyValues as $menuProductPropertyValue) {
+                    //foreach($restaurantMenuProductsPropertyValues as $menuProductPropertyValue) {
+                    foreach($menuProductProperty["ProductsPropertyValues"] as $menuProductPropertyValue) {
 
                         $restaurantMenuPropertyValueOut = $dom->createElement('PropertyValueOut');
 
-                        $menuRestaurantProductPropertyValueID = $dom->createElement('ProductPropertyID', $menuProductPropertyValue['product_property_value_id']);
-                        $menuRestaurantProductPropertyValuePropertyID = $dom->createElement('ProductPropertyID', $menuProductPropertyValue['product_property_id']);
+                        $menuRestaurantProductPropertyValueID = $dom->createElement('ProductPropertyID', $menuProductPropertyValue['id']);
+                        $menuRestaurantProductPropertyValuePropertyID = $dom->createElement('ProductPropertyID', $menuProductPropertyValue['id']);
                         $menuRestaurantProductPropertyValueProductID = $dom->createElement('ProductID', $menuProductPropertyValue['produt_property_value_product_id']);
-                        $menuRestaurantProductPropertyValueLabel = $dom->createElement('Label', $menuProductPropertyValue['label']);
-                        $menuRestaurantProductPropertyValuePrice = $dom->createElement('ProductID', $menuProductPropertyValue['price']);
+                        $menuRestaurantProductPropertyValueLabel = $dom->createElement('Label', $menuProductPropertyValue['name']);
+                        $menuRestaurantProductPropertyValuePrice = $dom->createElement('Price', $menuProductPropertyValue['price']);
 
                         $restaurantMenuPropertyValueOut->appendChild($menuRestaurantProductPropertyValueID);
                         $restaurantMenuPropertyValueOut->appendChild($menuRestaurantProductPropertyValuePropertyID);
@@ -805,18 +807,19 @@ $address = $jsonData->address;
                 $productMenuOut->appendChild($productCategoryOrder);
                 $productMenuOut->appendChild($productMenuID);
 
-                foreach ($restaurantMenuProductsProperty as $menuProductProperty) {
+                //foreach ($restaurantMenuProductsProperty as $menuProductProperty) {
+                foreach ($menuProduct["MenuProductsProperty"] as $menuProductProperty) {
 
                     /* --- Product Property */
                     $productPropertyOut = $dom->createElement('ProductPropertyOut');
 
-                    $productPropertyID = $dom->createElement('ProductPropertyID', 2);
-                    $productPropertyProductID = $dom->createElement('ProductID', 2);
-                    $productPropertyFatherProductPropertyID = $dom->createElement('FatherProductPropertyID', 2);
-                    $productPropertyName = $dom->createElement('Name', 2);
+                    $productPropertyID = $dom->createElement('ProductPropertyID', $menuProductProperty["id"]);
+                    $productPropertyProductID = $dom->createElement('ProductID', $menuProductProperty["id"]);
+                    $productPropertyFatherProductPropertyID = $dom->createElement('FatherProductPropertyID', $menuProductProperty["iddishes"]);
+                    $productPropertyName = $dom->createElement('Name', $menuProductProperty["name"]);
                     $productPropertyType = $dom->createElement('PropertyType', 2);
-                    $productPropertyGroupingTypeID = $dom->createElement('GroupingTypeID', 2);
-                    $productPropertyGroupingType = $dom->createElement('GroupingType', 2);
+                    $productPropertyGroupingTypeID = $dom->createElement('GroupingTypeID', $menuProductProperty["operation"]);
+                    $productPropertyGroupingType = $dom->createElement('GroupingType', $menuProductProperty["mandatory"]);
 
                     $productPropertyOut->appendChild($productPropertyID);
                     $productPropertyOut->appendChild($productPropertyProductID);
@@ -826,16 +829,17 @@ $address = $jsonData->address;
                     $productPropertyOut->appendChild($productPropertyGroupingTypeID);
                     $productPropertyOut->appendChild($productPropertyGroupingType);
 
-                    foreach ($restaurantMenuProductsPropertyValues as $productPropertyValue) {
+                    //foreach ($restaurantMenuProductsPropertyValues as $productPropertyValue) {
+                    foreach ($menuProductProperty["ProductsPropertyValues"] as $productPropertyValue) {
 
                         /* --- Product Property Value */
                         $productPropertyValueOut = $dom->createElement('PropertyValueOut');
 
-                        $productPropertyValueID = $dom->createElement('PropertyValueID', 3);
-                        $productPropertyValueProductPropertyID = $dom->createElement('ProductPropertyID', 3);
+                        $productPropertyValueID = $dom->createElement('PropertyValueID', $productPropertyValue["id"]);
+                        $productPropertyValueProductPropertyID = $dom->createElement('ProductPropertyID', $productPropertyValue["id"]);
                         $productPropertyValueProductID = $dom->createElement('ProductID', 3);
-                        $productPropertyValueLabel = $dom->createElement('Label', 3);
-                        $productPropertyValuePrice = $dom->createElement('Price', 3);
+                        $productPropertyValueLabel = $dom->createElement('Label', $productPropertyValue["name"]);
+                        $productPropertyValuePrice = $dom->createElement('Price', $productPropertyValue["price"]);
 
                         $productPropertyValueOut->appendChild($productPropertyValueID);
                         $productPropertyValueOut->appendChild($productPropertyValueProductPropertyID);
