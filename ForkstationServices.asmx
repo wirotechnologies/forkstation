@@ -595,15 +595,17 @@ $address = $jsonData->address;
         $jsonData = json_decode($obj->Body->GetRestaurantMenu->JsonGetRestaurantMenu);
 
         $restaurantID = $jsonData->RestaurantID;
-
+        $urlServices = "http://forkstation.com/api/menuOrden/".$restaurantID;
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $urlServices);
         curl_setopt($ch, CURLOPT_HEADER, 0);
-        curl_setopt($ch, CURLOPT_POST, true);
+        //curl_setopt($ch, CURLOPT_POST, true);
+        /*
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(array(
-            //'restaurant_id' => $restaurantID, 
-            'restaurant_id' => $_REQUEST["restaurant_id"],
+            'restaurant_id' => $restaurantID, 
+            //'restaurant_id' => $_REQUEST["RestaurantID"],
             'op' => $op)));
+        */
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         $result = curl_exec($ch);
@@ -671,7 +673,7 @@ $address = $jsonData->address;
                     $menuRestaurantProductPropertyFatherPropertyID = $dom->createElement('FatherProductPropertyID', $menuProductProperty['iddishes']);
                     $menuRestaurantProductPropertyName = $dom->createElement('Name', $menuProductProperty['name']);
                     $menuRestaurantProductPropertyType = $dom->createElement('PropertyType', $menuProductProperty['property_type']);
-                    $menuRestaurantProductPropertyGroupingTypeID = $dom->createElement('GroupingTypeID', $menuProductProperty['operation']);
+                    $menuRestaurantProductPropertyGroupingTypeID = $dom->createElement('GroupingTypeID', 3);
                     $menuRestaurantProductPropertyGroupingType = $dom->createElement('GroupingType', $menuProductProperty['grouping_type']);
 
                     $restaurantMenuPropertyOut->appendChild($menuRestaurantProductPropertyID);
@@ -687,7 +689,7 @@ $address = $jsonData->address;
 
                         $restaurantMenuPropertyValueOut = $dom->createElement('PropertyValueOut');
 
-                        $menuRestaurantProductPropertyValueID = $dom->createElement('ProductPropertyID', $menuProductPropertyValue['id']);
+                        $menuRestaurantProductPropertyValueID = $dom->createElement('PropertyValueID', $menuProductPropertyValue['id']);
                         $menuRestaurantProductPropertyValuePropertyID = $dom->createElement('ProductPropertyID', $menuProductPropertyValue['id']);
                         $menuRestaurantProductPropertyValueProductID = $dom->createElement('ProductID', $menuProductPropertyValue['produt_property_value_product_id']);
                         $menuRestaurantProductPropertyValueLabel = $dom->createElement('Label', $menuProductPropertyValue['name']);
@@ -818,7 +820,7 @@ $address = $jsonData->address;
                     $productPropertyFatherProductPropertyID = $dom->createElement('FatherProductPropertyID', $menuProductProperty["iddishes"]);
                     $productPropertyName = $dom->createElement('Name', $menuProductProperty["name"]);
                     $productPropertyType = $dom->createElement('PropertyType', 2);
-                    $productPropertyGroupingTypeID = $dom->createElement('GroupingTypeID', $menuProductProperty["operation"]);
+                    $productPropertyGroupingTypeID = $dom->createElement('GroupingTypeID', 3);
                     $productPropertyGroupingType = $dom->createElement('GroupingType', $menuProductProperty["mandatory"]);
 
                     $productPropertyOut->appendChild($productPropertyID);
@@ -1025,6 +1027,8 @@ $address = $jsonData->address;
             $jsonData["op"] = $op;
             //$jsonData["mail"]=$_REQUEST["mail"];
             //$jsonData["password"]=$_REQUEST["password"];
+
+           // $urlServices = "http://forkstation.com/api/login";
             curl_setopt($ch, CURLOPT_URL, $urlServices);
             curl_setopt($ch, CURLOPT_HEADER, 0);
             curl_setopt($ch, CURLOPT_POST, true);
@@ -1033,6 +1037,7 @@ $address = $jsonData->address;
 
             $result = curl_exec($ch);
             $data = $result;
+            //echo $data;
 
             $data = json_decode($data, true);
 
@@ -1150,6 +1155,7 @@ $address = $jsonData->address;
             echo $dom->saveXML();
             break;
         case 'CreateShoppingCart':
+            $urlServices = "http://forkstation.com/api/createshoppingcart";
             $jsonData = json_decode($obj->Body->CreateShoppingCart->JsonCreateShoppingCart, true);
             $ch = curl_init();
             $jsonData["op"] = $op;
@@ -1227,16 +1233,32 @@ $address = $jsonData->address;
             break;
         case 'SetTipsAndDiscount':
             $jsonData = json_decode($obj->Body->SetTipsAndDiscount->JsonSetTipsAndDiscount, true);
-            $jsonData["op"] = $op;
+            $jsonData["op"] = $op; 
             //$jsonData["orderid"] = $_REQUEST["orderid"];
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $urlServices);
-            curl_setopt($ch, CURLOPT_HEADER, 0);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
-                $jsonData
-            )); 
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            /*
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, $urlServices);
+                curl_setopt($ch, CURLOPT_HEADER, 0);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query(
+                    $jsonData
+                )); 
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                $result = curl_exec($ch);
+            */
+            $urlServices = 'http://forkstation.com/api/settipsanddiscount'; 
+            //Initiate cURL
+            $ch = curl_init($urlServices);
+             
+            //Use the CURLOPT_PUT option to tell cURL that
+            //this is a PUT request.
+            curl_setopt($ch, CURLOPT_PUT, true);             
+            //We want the result / output returned.
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);             
+            //Our fields.
+            $fields = $jsonData;
+            curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($fields));             
+            //Execute the request.
             $result = curl_exec($ch);
             $data = $result;
             //    echo $data;

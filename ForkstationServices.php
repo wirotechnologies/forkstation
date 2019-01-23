@@ -123,6 +123,14 @@ $address = $_POST['address'];
                     $restaurants[$i]['miles'] = (String)round ($row['distance'] / 1609.344, 1);
                     $restaurants[$i]['kilometers'] = (String)round ($row['distance'] / 1000, 1);
                     $list = getDishesRestaurantFavorite($row["id"], $conn);
+                    foreach ($list as $key => $value) {
+                        $properties = getPropertiesProduct($value["ProductID"], $conn);
+                        foreach ($properties as $key2 => $value2) {
+                            $properties[$key2]["ProductsPropertyValues"] = getMenuAdds($value2["id"], $conn);
+                        }
+                        $list[$key]["MenuProductsProperty"] = $properties;
+
+                    }
                     $restaurants[$i]["listdishes"] = $list;
                     $i++;
                 }
